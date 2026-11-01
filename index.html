@@ -70,8 +70,8 @@ canvas{position:fixed;inset:0;width:100%;height:100%}
 <div class="panel rt" id="p5"><h3>MODULE</h3>
   <div class="r"><span>SPRACH-EINGABE</span><b id="m1">AUS</b></div>
   <div class="r"><span>SPRACH-AUSGABE</span><b id="m2">BEREIT</b></div>
-  <div class="r"><span>KI-KERN</span><b id="m3">GROQ LLAMA</b></div>
-  <div class="r" id="wk" style="cursor:pointer" title="Klicken zum Umschalten"><span>WAKE-WORT</span><b id="m4">AUS</b></div>
+  <div class="r"><span>KI-KERN</span><b id="m3">GPT-OSS 120B</b></div>
+  <div class="r" id="wk"><span>DAUERHÖREN</span><b id="m4">AN</b></div>
 </div>
 <div class="panel rt" id="p6"><h3>BEFEHLSPROTOKOLL</h3><div id="log"></div></div>
 
@@ -121,7 +121,6 @@ const TOOLS = [{ functionDeclarations: [
   { name:"get_location", description:"Ermittelt den aktuellen Standort." },
   { name:"copy_text", description:"Kopiert Text in die Zwischenablage.", parameters:P({text:S},["text"]) },
   { name:"set_voice", description:"Sprechtempo (0.5-2), Tonhöhe (0-2), Lautstärke (0-1).", parameters:P({rate:{type:"NUMBER"},pitch:{type:"NUMBER"},volume:{type:"NUMBER"}}) },
-  { name:"set_wake_word", description:"Schaltet um, ob Aria nur auf das Wort Aria reagiert.", parameters:P({enabled:{type:"BOOLEAN"}},["enabled"]) },
   { name:"cancel_timers", description:"Bricht alle Timer ab." },
   { name:"fullscreen", description:"Vollbild an oder aus.", parameters:P({on:{type:"BOOLEAN"}},["on"]) }
 ]}];
@@ -157,7 +156,10 @@ async function runTool(n, a){
     case "list_notes": { const x = ls.g("aria_notes", []); return x.length ? x : "keine Notizen"; }
     case "clear_notes": ls.s("aria_notes", []); renderNotes(); return "gelöscht";
     case "set_color": document.documentElement.style.setProperty("--c", a.color); return "Farbe geändert";
-    case "research": { const r = await groq({ model:"groq/compound-mini", messages:[{ role:"system", content:"Recherchiere im Web und antworte auf Deutsch präzise in höchstens 120 Wörtern mit konkreten Fakten, Zahlen und Quellen-Namen." }, { role:"user", content:a.query }] }); return r.choices?.[0]?.message?.content || "nichts gefunden"; }
+    case "research": { const msgs = [{ role:"system", content:"Recherchiere im Web und antworte auf Deutsch präzise in höchstens 120 Wörtern mit konkreten Fakten, Zahlen und Quellen-Namen." }, { role:"user", content:a.query }];
+      let r; try{ r = await groq({ model:"openai/gpt-oss-120b", messages:msgs, tools:[{ type:"browser_search" }], reasoning_effort:"low", max_completion_tokens:2000 }); }
+      catch(e){ r = await groq({ model:"openai/gpt-oss-20b", messages:msgs, reasoning_effort:"low", max_completion_tokens:1200 }); }
+      return r.choices?.[0]?.message?.content || "nichts gefunden"; }
     case "calculate": { const e = String(a.expression); if(!/^[\d\s+\-*/().,%a-z]*$/i.test(e) || /[a-z]/i.test(e.replace(/\b(sqrt|sin|cos|tan|log|abs|pow|min|max|round|floor|ceil|pi|exp)\b/gi, ""))) return "ungültiger Ausdruck"; return String(Function("with(Math){return " + e.replace(/\bpi\b/gi, "PI") + "}")()); }
     case "show_card": showCard(a.title, a.text, a.links); return "angezeigt";
     case "close_card": $("#card").hidden = true; return "geschlossen";
@@ -167,7 +169,6 @@ async function runTool(n, a){
     case "get_location": return await new Promise(r => navigator.geolocation ? navigator.geolocation.getCurrentPosition(p => r({ lat:p.coords.latitude, lon:p.coords.longitude }), () => r("Standort nicht erlaubt"), { timeout:8000 }) : r("nicht unterstützt"));
     case "copy_text": try{ await navigator.clipboard.writeText(a.text); return "kopiert"; }catch(e){ return "Zwischenablage nicht erlaubt"; }
     case "set_voice": if(a.rate) vo.rate = Math.min(2, Math.max(.5, a.rate)); if(a.pitch !== undefined) vo.pitch = Math.min(2, Math.max(0, a.pitch)); if(a.volume !== undefined) vo.volume = Math.min(1, Math.max(0, a.volume)); return "Stimme angepasst";
-    case "set_wake_word": setWake(!!a.enabled); return a.enabled ? "Wake-Wort an" : "Wake-Wort aus";
     case "cancel_timers": timers.length = 0; return "Timer gelöscht";
     case "fullscreen": try{ a.on ? await document.documentElement.requestFullscreen() : await document.exitFullscreen(); return "ok"; }catch(e){ return "Vollbild nicht möglich"; }
   } return "unbekannt"; }catch(e){ return "Fehler: " + e.message; }
@@ -186,7 +187,7 @@ async function groq(body){
 }
 async function chat(body){
   let err;
-  for(const m of ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]) for(let k = 0; k < 2; k++){
+  for(const m of ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]) for(let k = 0; k < 2; k++){
     try{ return await groq({ ...body, model: m }); }
     catch(e){ err = e; if(e.name === "TypeError"){ err = new Error("Netzwerkfehler"); await wait(600); continue; }
       if([429, 500, 502, 503, 504].includes(e.status) || e.code === "tool_use_failed"){ await wait(600); continue; }
@@ -197,7 +198,7 @@ async function chat(body){
 async function ask(text){
   history.push({ role:"user", content:text });
   for(let i = 0; i < 8; i++){
-    const d = await chat({ messages:[{ role:"system", content: sys() }, ...history], tools: OTOOLS, tool_choice:"auto", temperature:.6, max_tokens:800 });
+    const d = await chat({ messages:[{ role:"system", content: sys() }, ...history], tools: OTOOLS, tool_choice:"auto", temperature:.6, max_completion_tokens:1500, reasoning_effort:"low" });
     const m = d.choices?.[0]?.message;
     if(!m) throw new Error("Leere Antwort");
     history.push({ role:"assistant", content: m.content || "", ...(m.tool_calls?.length ? { tool_calls: m.tool_calls } : {}) });
@@ -242,8 +243,8 @@ function say(t){ return new Promise(res => {
 
 const WAKE = /\b(aria|arja|arya|maria|area|ariel|arie|jarvis)\b[,.!?:]*\s*/i;
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, rOn = false, started = false, wakeOn = ls.g("aria_wake", false), lastStart = 0;
-function setWake(v){ wakeOn = v; ls.s("aria_wake", v); $("#m4").textContent = v ? "ARIA" : "AUS"; }
+let rec = null, rOn = false, started = false, wakeOn = false, lastStart = 0;
+function setWake(){ wakeOn = false; $("#m4").textContent = "AN"; }
 function startRec(){
   if(!SR || !started || rOn || busy || speaking || Date.now() - lastStart < 800) return;
   lastStart = Date.now();
@@ -273,7 +274,6 @@ function showCard(title, text, links){
   (links || []).slice(0, 8).forEach(x => { if(!/^https?:\/\//.test(x.url || "")) return; const a = document.createElement("a"); a.href = x.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = "› " + (x.title || x.url); l.append(a); });
   $("#card").hidden = false; }
 $("#cx").onclick = () => { $("#card").hidden = true; };
-$("#wk").onclick = () => setWake(!wakeOn);
 $("#cv").onclick = $("#state").onclick = () => speechSynthesis.cancel();
 addEventListener("keydown", e => { if(e.code === "Space"){ e.preventDefault(); speechSynthesis.cancel(); } });
 setWake(wakeOn);
