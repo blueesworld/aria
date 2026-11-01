@@ -3,291 +3,279 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Aria</title>
+<title>A.R.I.A.</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0a1418; --panel:#102229; --line:#1d3a44; --ink:#e4f1f0; --dim:#7fa3a6;
-  --glow:#35d6c4; --think:#f2b84b; --speak:#7aa8ff; --err:#ff7a6b;
-}
+:root{--c:#2ee6ff;--c2:#0b6b86;--bg:#020b10;--warn:#ffb340;--ok:#5dffb0}
 *{box-sizing:border-box;margin:0}
-html,body{height:100%}
-body{background:radial-gradient(ellipse at 50% 28%,#12303a 0%,var(--bg) 62%);color:var(--ink);
-  font:16px/1.5 "Segoe UI",system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;overflow:hidden}
-header{width:100%;max-width:760px;display:flex;justify-content:space-between;align-items:center;padding:16px 20px}
-h1{font:600 22px/1 Georgia,"Times New Roman",serif;letter-spacing:.35em;color:var(--glow)}
-#status{color:var(--dim);font-size:14px;min-height:21px;text-align:center}
-button,input,select{font:inherit;color:inherit}
-button{cursor:pointer}
-.ghost{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 12px;color:var(--dim)}
-.ghost:hover,.ghost:focus-visible{color:var(--ink);border-color:var(--glow)}
-:focus-visible{outline:2px solid var(--glow);outline-offset:2px}
-
-#stage{display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px 0 4px}
-#orb{width:150px;height:150px;border-radius:50%;border:0;position:relative;
-  background:radial-gradient(circle at 35% 30%,#aef5ec,var(--glow) 40%,#0f6d68 100%);
-  box-shadow:0 0 40px 6px rgba(53,214,196,.35);transition:transform .2s,box-shadow .3s,background .3s}
-#orb::after{content:"";position:absolute;inset:-14px;border-radius:50%;border:2px solid var(--glow);opacity:.35}
-#orb[data-s=idle]{animation:breathe 5s ease-in-out infinite;filter:saturate(.5) brightness(.75)}
-#orb[data-s=listening]{animation:pulse 1.1s ease-in-out infinite}
-#orb[data-s=thinking]{background:radial-gradient(circle at 35% 30%,#ffe9b5,var(--think) 40%,#8a5c0f 100%);
-  box-shadow:0 0 44px 8px rgba(242,184,75,.4);animation:spin 1.4s linear infinite}
-#orb[data-s=thinking]::after{border-color:var(--think);border-style:dashed}
-#orb[data-s=speaking]{background:radial-gradient(circle at 35% 30%,#d4e3ff,var(--speak) 40%,#27408a 100%);
-  box-shadow:0 0 50px 10px rgba(122,168,255,.45);animation:talk .55s ease-in-out infinite}
-#orb[data-s=speaking]::after{border-color:var(--speak)}
-@keyframes breathe{50%{transform:scale(1.04)}}
-@keyframes pulse{50%{transform:scale(1.1);box-shadow:0 0 70px 16px rgba(53,214,196,.5)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes talk{0%,100%{transform:scale(1)}30%{transform:scale(1.09)}60%{transform:scale(.97)}}
-@media(prefers-reduced-motion:reduce){#orb{animation:none!important}}
-
-#log{flex:1;width:100%;max-width:760px;overflow-y:auto;padding:12px 20px;display:flex;flex-direction:column;gap:10px}
-.m{max-width:85%;padding:9px 14px;border-radius:14px;white-space:pre-wrap;word-wrap:break-word}
-.m.u{align-self:flex-end;background:#16414a;border-bottom-right-radius:4px}
-.m.a{align-self:flex-start;background:var(--panel);border:1px solid var(--line);border-bottom-left-radius:4px}
-.m.s{align-self:center;color:var(--dim);font-size:13px;background:none}
-.m.e{align-self:center;color:var(--err);font-size:14px}
-.m a{color:var(--speak)}
-
-footer{width:100%;max-width:760px;padding:10px 20px 18px;display:flex;gap:8px}
-#txt{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
-#txt::placeholder{color:var(--dim)}
-.btn{background:var(--glow);color:#04211f;border:0;border-radius:10px;padding:10px 16px;font-weight:600}
-.btn.off{background:var(--panel);color:var(--ink);border:1px solid var(--line)}
-
-dialog{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:22px;width:min(440px,92vw);margin:auto}
-dialog::backdrop{background:rgba(0,0,0,.6)}
-dialog h2{font:600 18px Georgia,serif;margin-bottom:14px}
-label{display:block;margin:12px 0 4px;color:var(--dim);font-size:14px}
-dialog input[type=password],dialog input[type=text],dialog select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 12px}
-.row{display:flex;align-items:center;gap:8px;margin-top:12px}
-.row label{margin:0;color:var(--ink)}
-.acts{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
-small{color:var(--dim);display:block;margin-top:6px;font-size:12.5px}
+html,body{height:100%;background:var(--bg);color:var(--c);overflow:hidden;
+  font:13px/1.45 "Share Tech Mono",Consolas,monospace}
+body{background:radial-gradient(ellipse at 50% 50%,#06222d 0%,var(--bg) 70%)}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.07;
+  background:repeating-linear-gradient(0deg,var(--c) 0 1px,transparent 1px 4px)}
+canvas{position:fixed;inset:0;width:100%;height:100%}
+.orb{font-family:Orbitron,"Segoe UI",sans-serif}
+.panel{position:fixed;width:min(290px,26vw);padding:12px 14px;background:rgba(4,30,42,.55);
+  border:1px solid var(--c2);backdrop-filter:blur(3px)}
+.panel::before,.panel::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--c)}
+.panel::before{top:-2px;left:-2px;border-right:0;border-bottom:0}
+.panel::after{bottom:-2px;right:-2px;border-left:0;border-top:0}
+.panel h3{font:600 12px Orbitron,sans-serif;letter-spacing:.25em;margin-bottom:8px;color:var(--c);opacity:.9}
+.panel div.r{display:flex;justify-content:space-between;gap:8px;color:#9fe9f5}
+.panel b{color:var(--c);font-weight:400}
+.l{left:22px}.rt{right:22px}
+#p1{top:70px}#p2{top:290px}#p3{bottom:70px}
+#p4{top:70px}#p5{top:290px}#p6{bottom:70px}
+.bar{height:5px;background:#0a3340;margin:2px 0 7px}.bar i{display:block;height:100%;background:var(--c);width:0;transition:width .8s}
+#log div,#notes div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#9fe9f5}
+#log div.ok{color:var(--ok)}#log div.er{color:var(--warn)}
+#top{position:fixed;top:14px;left:0;right:0;text-align:center}
+#clock{font:800 28px Orbitron,sans-serif;letter-spacing:.2em;text-shadow:0 0 14px var(--c)}
+#date{opacity:.7;letter-spacing:.15em}
+#state{position:fixed;left:0;right:0;bottom:118px;text-align:center;font:600 15px Orbitron,sans-serif;letter-spacing:.4em}
+#sub{position:fixed;left:50%;transform:translateX(-50%);bottom:30px;width:min(640px,50vw);text-align:center;color:#d6faff;
+  font-size:16px;min-height:60px;text-shadow:0 0 8px #000}
+#sub small{display:block;color:var(--c);opacity:.7;margin-bottom:4px}
+#boot{position:fixed;inset:0;z-index:9;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;cursor:pointer}
+#boot h1{font:800 54px Orbitron,sans-serif;letter-spacing:.5em;text-shadow:0 0 24px var(--c);padding-left:.5em}
+#boot p{opacity:.8;letter-spacing:.2em;animation:bl 1.6s infinite}
+@keyframes bl{50%{opacity:.25}}
+@media(max-width:900px){.panel{display:none}#sub{width:90vw}}
+@media(prefers-reduced-motion:reduce){#boot p{animation:none}}
 </style>
 </head>
 <body>
-<header>
-  <h1>ARIA</h1>
-  <button class="ghost" id="setBtn">Einstellungen</button>
-</header>
+<canvas id="cv"></canvas>
 
-<div id="stage">
-  <button id="orb" data-s="idle" aria-label="Aria zuhören lassen"></button>
-  <div id="status" role="status" aria-live="polite">Tippe auf die Kugel und sprich.</div>
+<div id="top"><div id="clock">--:--:--</div><div id="date"></div></div>
+
+<div class="panel l" id="p1"><h3>SYSTEM</h3>
+  <div class="r"><span>KERNE</span><b id="cpu">-</b></div>
+  <div class="r"><span>RAM</span><b id="ram">-</b></div>
+  <div class="r"><span>NETZ</span><b id="net">-</b></div>
+  <div class="r"><span>AKKU</span><b id="bat">-</b></div>
+  <div class="bar"><i id="batbar"></i></div>
+  <div class="r"><span>KERN-LAST</span><b id="load">-</b></div>
+  <div class="bar"><i id="loadbar"></i></div>
 </div>
+<div class="panel l" id="p2"><h3>TIMER</h3><div id="timers"><div style="opacity:.5">keine aktiv</div></div></div>
+<div class="panel l" id="p3"><h3>NOTIZEN</h3><div id="notes"></div></div>
 
-<div id="log" aria-live="polite"></div>
+<div class="panel rt" id="p4"><h3>WETTER</h3><div id="wx">lade …</div></div>
+<div class="panel rt" id="p5"><h3>MODULE</h3>
+  <div class="r"><span>SPRACH-EINGABE</span><b id="m1">AUS</b></div>
+  <div class="r"><span>SPRACH-AUSGABE</span><b id="m2">BEREIT</b></div>
+  <div class="r"><span>KI-KERN</span><b id="m3">GEMINI 2.5</b></div>
+  <div class="r"><span>WAKE-WORT</span><b>ARIA</b></div>
+</div>
+<div class="panel rt" id="p6"><h3>BEFEHLSPROTOKOLL</h3><div id="log"></div></div>
 
-<footer>
-  <input id="txt" placeholder="Oder schreib Aria etwas …" autocomplete="off">
-  <button class="btn" id="send">Senden</button>
-  <button class="btn off" id="mic" aria-pressed="false">Dauerhören: aus</button>
-</footer>
+<div id="state">STANDBY</div>
+<div id="sub"><small>ARIA</small><span id="subt"></span></div>
 
-<dialog id="dlg">
-  <h2>Einstellungen</h2>
-  <label for="key">Gemini API-Key</label>
-  <input type="password" id="key" autocomplete="off">
-  <small>Wird nur in diesem Browser (localStorage) gespeichert.</small>
-  <label for="voice">Stimme</label>
-  <select id="voice"></select>
-  <div class="row"><input type="checkbox" id="wake" checked><label for="wake">Nur auf „Aria“ reagieren (Dauerhören)</label></div>
-  <div class="row"><input type="checkbox" id="speakOn" checked><label for="speakOn">Antworten vorlesen</label></div>
-  <div class="acts">
-    <button class="ghost" id="clearBtn">Verlauf löschen</button>
-    <button class="btn" id="saveBtn">Speichern</button>
-  </div>
-</dialog>
+<div id="boot"><h1>ARIA</h1><p>BERÜHREN ZUM STARTEN</p></div>
 
 <script>
 "use strict";
-const $ = s => document.querySelector(s);
+const KEY = "AQ.Ab8RN6JPbKlrPbc2WaWbbcRWih3zX2IVeu0ejSP1ugwKCFwCVQ";
 const MODEL = "gemini-2.5-flash";
-const URL_API = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
-const store = {
-  get(k, d){ try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
-  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
-};
-let cfg = { key: store.get("aria_key",""), voice: store.get("aria_voice",""), wake: store.get("aria_wake",true), speak: store.get("aria_speak",true) };
-let history = [], busy = false, always = false, awakeUntil = 0, speaking = false;
+const API = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+const $ = s => document.querySelector(s);
+const ls = { g(k,d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+             s(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} } };
 
-const SYS = `Du bist Aria, ein persönlicher Sprachassistent im Stil von Jarvis: loyal, ruhig, trocken-witzig, sehr kompetent. Sprich Deutsch und duze den Nutzer. Deine Antworten werden vorgelesen: antworte kurz (meist 1-3 Sätze), ohne Markdown, Listen, Sternchen oder Emojis. Wenn der Nutzer etwas erledigt haben will (Webseite öffnen, suchen, Video, Karte, Timer, Notiz, Wetter, Uhrzeit, Farbe ändern), rufe das passende Tool auf, statt nur darüber zu reden. Bestätige danach knapp, was du getan hast. Frage nur nach, wenn wirklich Infos fehlen.`;
+let state = "standby", history = [], busy = false, speaking = false, awakeUntil = 0, level = 0;
+const timers = [];
 
+const SYS = `Du bist ARIA, ein Sprachassistent im Stil von J.A.R.V.I.S. aus Iron Man: souverän, höflich, trocken-witzig, hocheffizient. Sprich Deutsch, duze den Nutzer, nenne ihn gelegentlich "Boss". Deine Antworten werden vorgelesen: kurz (1-3 Sätze), kein Markdown, keine Listen, keine Emojis. Wenn der Nutzer etwas erledigt haben will (Webseite öffnen, suchen, Video, Karte, Timer, Notiz, Wetter, Uhrzeit, Farbe ändern), rufe sofort das passende Tool auf und bestätige knapp. Für Wissensfragen antworte direkt. Frage nur nach, wenn wirklich Infos fehlen.`;
+
+const P = (props, req) => ({ type:"OBJECT", properties:props, required:req });
+const S = { type:"STRING" };
 const TOOLS = [{ functionDeclarations: [
-  { name:"open_url", description:"Öffnet eine Webseite in einem neuen Tab.", parameters:{type:"OBJECT",properties:{url:{type:"STRING",description:"Vollständige URL"}},required:["url"]} },
-  { name:"web_search", description:"Googelt etwas in einem neuen Tab.", parameters:{type:"OBJECT",properties:{query:{type:"STRING"}},required:["query"]} },
-  { name:"youtube", description:"Sucht auf YouTube und öffnet die Ergebnisse.", parameters:{type:"OBJECT",properties:{query:{type:"STRING"}},required:["query"]} },
-  { name:"maps", description:"Zeigt einen Ort oder eine Route in Google Maps.", parameters:{type:"OBJECT",properties:{query:{type:"STRING"}},required:["query"]} },
-  { name:"get_datetime", description:"Gibt aktuelles Datum und Uhrzeit zurück." },
-  { name:"weather", description:"Aktuelles Wetter und Vorhersage für eine Stadt.", parameters:{type:"OBJECT",properties:{city:{type:"STRING"}},required:["city"]} },
-  { name:"set_timer", description:"Stellt einen Timer. Aria meldet sich, wenn er abläuft.", parameters:{type:"OBJECT",properties:{seconds:{type:"NUMBER"},label:{type:"STRING"}},required:["seconds"]} },
-  { name:"save_note", description:"Speichert eine Notiz dauerhaft.", parameters:{type:"OBJECT",properties:{text:{type:"STRING"}},required:["text"]} },
-  { name:"list_notes", description:"Liest alle gespeicherten Notizen vor." },
-  { name:"set_color", description:"Ändert die Akzentfarbe der Oberfläche.", parameters:{type:"OBJECT",properties:{color:{type:"STRING",description:"CSS-Farbe oder Hex, z.B. #ff5577"}},required:["color"]} }
+  { name:"open_url", description:"Öffnet eine Webseite in neuem Tab.", parameters:P({url:S},["url"]) },
+  { name:"web_search", description:"Googelt etwas in neuem Tab.", parameters:P({query:S},["query"]) },
+  { name:"youtube", description:"Sucht auf YouTube.", parameters:P({query:S},["query"]) },
+  { name:"maps", description:"Zeigt Ort oder Route in Google Maps.", parameters:P({query:S},["query"]) },
+  { name:"get_datetime", description:"Aktuelles Datum und Uhrzeit." },
+  { name:"weather", description:"Wetter für eine Stadt, wird auch im Dashboard angezeigt.", parameters:P({city:S},["city"]) },
+  { name:"set_timer", description:"Stellt einen Timer.", parameters:P({seconds:{type:"NUMBER"},label:S},["seconds"]) },
+  { name:"save_note", description:"Speichert eine Notiz.", parameters:P({text:S},["text"]) },
+  { name:"list_notes", description:"Liefert alle Notizen." },
+  { name:"clear_notes", description:"Löscht alle Notizen." },
+  { name:"set_color", description:"Ändert die HUD-Farbe.", parameters:P({color:{type:"STRING",description:"Hex wie #ff5577"}},["color"]) }
 ]}];
 
-/* ---------- UI ---------- */
-function setState(s, text){ $("#orb").dataset.s = s; if(text !== undefined) $("#status").textContent = text; }
-function add(cls, text){
-  const d = document.createElement("div"); d.className = "m " + cls;
-  if(cls === "s" && /^https?:/.test(text)){ const a = document.createElement("a"); a.href = text; a.target = "_blank"; a.rel = "noopener"; a.textContent = text; d.append("Popup blockiert – hier klicken: ", a); }
-  else d.textContent = text;
-  const l = $("#log"); l.append(d); l.scrollTop = l.scrollHeight; return d;
+/* ---------- Anzeige ---------- */
+function setState(s){ state = s; $("#state").textContent = {standby:"STANDBY",listening:"ICH HÖRE",thinking:"VERARBEITE",speaking:"ANTWORTE"}[s]; $("#m1").textContent = rOn ? "AKTIV" : "AUS"; $("#m2").textContent = s === "speaking" ? "SENDET" : "BEREIT"; }
+function sub(who, t){ $("#sub small").textContent = who; $("#subt").textContent = t; }
+function log(t, cls){ const d = document.createElement("div"); d.textContent = new Date().toLocaleTimeString("de-DE") + "  " + t; if(cls) d.className = cls; const l = $("#log"); l.prepend(d); while(l.children.length > 7) l.lastChild.remove(); }
+function renderNotes(){ const n = ls.g("aria_notes", []).slice(-5).reverse(); $("#notes").innerHTML = ""; if(!n.length){ $("#notes").innerHTML = '<div style="opacity:.5">leer</div>'; return; } n.forEach(x => { const d = document.createElement("div"); d.textContent = "› " + x.text; $("#notes").append(d); }); }
+function go(u){ const w = window.open(u, "_blank", "noopener"); if(!w) log("Popup blockiert – bitte Popups erlauben", "er"); return !!w; }
+
+const WMO = c => c===0?"klar":c<4?"bewölkt":c<50?"Nebel":c<60?"Nieselregen":c<70?"Regen":c<80?"Schnee":c<86?"Schauer":"Gewitter";
+async function getWeather(city, lat, lon){
+  if(city){ const g = await (await fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&language=de&name=" + encodeURIComponent(city))).json(); if(!g.results) return null; ({latitude:lat, longitude:lon, name:city} = g.results[0]); }
+  const w = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=3`)).json();
+  const c = w.current, d = w.daily;
+  $("#wx").innerHTML = `<div class="r"><span>${city}</span><b>${Math.round(c.temperature_2m)}°C</b></div><div class="r"><span>${WMO(c.weather_code)}</span><b>gefühlt ${Math.round(c.apparent_temperature)}°</b></div><div class="r"><span>Wind</span><b>${Math.round(c.wind_speed_10m)} km/h</b></div>` +
+    d.time.map((t,i) => `<div class="r"><span>${new Date(t).toLocaleDateString("de-DE",{weekday:"short"})}</span><b>${Math.round(d.temperature_2m_min[i])}/${Math.round(d.temperature_2m_max[i])}° ${d.precipitation_probability_max[i]}%</b></div>`).join("");
+  return { ort: city, jetzt: { temperatur: c.temperature_2m, gefuehlt: c.apparent_temperature, wind_kmh: c.wind_speed_10m, zustand: WMO(c.weather_code) }, vorhersage: d };
 }
-function go(url){ const w = window.open(url, "_blank", "noopener"); if(!w){ add("s", url); return false; } return true; }
 
 /* ---------- Tools ---------- */
-const timers = [];
-async function runTool(name, a){
-  try{
-    switch(name){
-      case "open_url": { let u = a.url; if(!/^https?:\/\//.test(u)) u = "https://" + u; return go(u) ? "geöffnet" : "Popup blockiert, Link im Chat angezeigt"; }
-      case "web_search": return go("https://www.google.com/search?q=" + encodeURIComponent(a.query)) ? "Suche geöffnet" : "Popup blockiert, Link im Chat";
-      case "youtube": return go("https://www.youtube.com/results?search_query=" + encodeURIComponent(a.query)) ? "YouTube geöffnet" : "Popup blockiert, Link im Chat";
-      case "maps": return go("https://www.google.com/maps/search/" + encodeURIComponent(a.query)) ? "Karte geöffnet" : "Popup blockiert, Link im Chat";
-      case "get_datetime": return new Date().toLocaleString("de-DE", { dateStyle:"full", timeStyle:"medium" });
-      case "weather": {
-        const g = await (await fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&language=de&name=" + encodeURIComponent(a.city))).json();
-        if(!g.results) return "Ort nicht gefunden";
-        const p = g.results[0];
-        const w = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.latitude}&longitude=${p.longitude}&current=temperature_2m,apparent_temperature,precipitation,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=3`)).json();
-        return { ort: p.name, jetzt: w.current, vorhersage_3_tage: w.daily, hinweis: "weather_code ist ein WMO-Code" };
-      }
-      case "set_timer": {
-        const s = Math.max(1, Math.round(a.seconds)), label = a.label || "Timer";
-        timers.push(setTimeout(() => { beep(); say(`${label} ist abgelaufen.`); add("a", `⏰ ${label} ist abgelaufen.`); }, s * 1000));
-        return `Timer für ${s} Sekunden läuft`;
-      }
-      case "save_note": { const n = store.get("aria_notes", []); n.push({ t: new Date().toLocaleString("de-DE"), text: a.text }); store.set("aria_notes", n); return "Notiz gespeichert"; }
-      case "list_notes": { const n = store.get("aria_notes", []); return n.length ? n : "Keine Notizen vorhanden"; }
-      case "set_color": { document.documentElement.style.setProperty("--glow", a.color); return "Farbe geändert"; }
-    }
-    return "Unbekanntes Tool";
-  }catch(e){ return "Fehler: " + e.message; }
+async function runTool(n, a){
+  try{ switch(n){
+    case "open_url": { let u = a.url; if(!/^https?:\/\//.test(u)) u = "https://" + u; return go(u) ? "geöffnet" : "Popup blockiert"; }
+    case "web_search": return go("https://www.google.com/search?q=" + encodeURIComponent(a.query)) ? "Suche geöffnet" : "Popup blockiert";
+    case "youtube": return go("https://www.youtube.com/results?search_query=" + encodeURIComponent(a.query)) ? "YouTube geöffnet" : "Popup blockiert";
+    case "maps": return go("https://www.google.com/maps/search/" + encodeURIComponent(a.query)) ? "Karte geöffnet" : "Popup blockiert";
+    case "get_datetime": return new Date().toLocaleString("de-DE", { dateStyle:"full", timeStyle:"medium" });
+    case "weather": return (await getWeather(a.city)) || "Ort nicht gefunden";
+    case "set_timer": { const s = Math.max(1, Math.round(a.seconds)); timers.push({ end: Date.now() + s*1000, label: a.label || "Timer" }); return `Timer ${s} Sekunden läuft`; }
+    case "save_note": { const x = ls.g("aria_notes", []); x.push({ text: a.text }); ls.s("aria_notes", x); renderNotes(); return "gespeichert"; }
+    case "list_notes": { const x = ls.g("aria_notes", []); return x.length ? x : "keine Notizen"; }
+    case "clear_notes": ls.s("aria_notes", []); renderNotes(); return "gelöscht";
+    case "set_color": document.documentElement.style.setProperty("--c", a.color); return "Farbe geändert";
+  } return "unbekannt"; }catch(e){ return "Fehler: " + e.message; }
 }
-function beep(){
-  try{ const c = new AudioContext(), o = c.createOscillator(), g = c.createGain();
-    o.connect(g); g.connect(c.destination); o.frequency.value = 880; g.gain.setValueAtTime(.2, c.currentTime);
-    g.gain.exponentialRampToValueAtTime(.001, c.currentTime + 1); o.start(); o.stop(c.currentTime + 1); }catch(e){}
-}
+function beep(){ try{ const c = new AudioContext(), o = c.createOscillator(), g = c.createGain(); o.connect(g); g.connect(c.destination); o.frequency.value = 880; g.gain.setValueAtTime(.2, c.currentTime); g.gain.exponentialRampToValueAtTime(.001, c.currentTime + 1.2); o.start(); o.stop(c.currentTime + 1.2); }catch(e){} }
 
 /* ---------- Gemini ---------- */
 async function ask(text){
   history.push({ role:"user", parts:[{ text }] });
   while(history.length > 40){ history.shift(); while(history.length && !(history[0].role === "user" && history[0].parts[0].text)) history.shift(); }
   for(let i = 0; i < 6; i++){
-    const r = await fetch(URL_API, { method:"POST",
-      headers:{ "Content-Type":"application/json", "x-goog-api-key": cfg.key },
+    const r = await fetch(API, { method:"POST", headers:{ "Content-Type":"application/json", "x-goog-api-key": KEY },
       body: JSON.stringify({ systemInstruction:{ parts:[{ text: SYS }] }, contents: history, tools: TOOLS }) });
     if(!r.ok){ const e = await r.json().catch(() => ({})); throw new Error(e.error?.message || ("HTTP " + r.status)); }
-    const d = await r.json();
-    const c = d.candidates?.[0]?.content;
-    if(!c || !c.parts) throw new Error("Leere Antwort von Gemini (evtl. blockiert).");
+    const c = (await r.json()).candidates?.[0]?.content;
+    if(!c || !c.parts) throw new Error("Leere Antwort");
     history.push(c);
     const calls = c.parts.filter(p => p.functionCall);
     if(!calls.length) return c.parts.map(p => p.text || "").join("").trim();
     const resp = [];
-    for(const p of calls){
-      add("s", "⚙ " + p.functionCall.name + " " + JSON.stringify(p.functionCall.args || {}));
-      const out = await runTool(p.functionCall.name, p.functionCall.args || {});
-      resp.push({ functionResponse:{ name: p.functionCall.name, response:{ result: out } } });
-    }
+    for(const p of calls){ log("▸ " + p.functionCall.name + " " + Object.values(p.functionCall.args || {}).join(" "), "ok");
+      resp.push({ functionResponse:{ name: p.functionCall.name, response:{ result: await runTool(p.functionCall.name, p.functionCall.args || {}) } } }); }
     history.push({ role:"user", parts: resp });
   }
-  return "Das hat zu viele Schritte gebraucht.";
+  return "Das war zu verschachtelt, Boss.";
+}
+async function handle(t){
+  t = t.trim(); if(!t || busy) return;
+  busy = true; stopRec(); speechSynthesis.cancel(); sub("DU", t); setState("thinking");
+  try{ const a = await ask(t); sub("ARIA", a); awakeUntil = Date.now() + 9000; await say(a); }
+  catch(e){ log("Fehler: " + e.message, "er"); sub("FEHLER", e.message); }
+  busy = false; setState("standby"); startRec();
 }
 
-async function handle(text){
-  text = text.trim(); if(!text || busy) return;
-  if(!cfg.key){ $("#dlg").showModal(); return; }
-  busy = true; stopRec(); speechSynthesis.cancel();
-  add("u", text); setState("thinking", "Aria denkt …");
-  try{
-    const ans = await ask(text);
-    add("a", ans || "…");
-    awakeUntil = Date.now() + 9000;
-    await say(ans);
-  }catch(e){ add("e", "Fehler: " + e.message); }
-  busy = false; setState("idle", always ? "Ich höre zu …" : "Tippe auf die Kugel und sprich.");
-  if(always) startRec();
-}
+/* ---------- Stimme ---------- */
+let voice = null;
+function pickVoice(){ const v = speechSynthesis.getVoices().filter(x => x.lang.startsWith("de")); voice = v.find(x => /male|conrad|stefan|markus|google deutsch/i.test(x.name)) || v[0] || null; }
+speechSynthesis.onvoiceschanged = pickVoice; pickVoice();
+function say(t){ return new Promise(res => {
+  if(!t){ res(); return; }
+  const parts = t.replace(/[*_`#>]/g, "").replace(/https?:\/\/\S+/g, "Link").match(/[^.!?\n]+[.!?]*/g) || [t];
+  let i = 0; speaking = true; setState("speaking");
+  const next = () => { if(i >= parts.length){ speaking = false; res(); return; }
+    const u = new SpeechSynthesisUtterance(parts[i++].trim()); u.lang = "de-DE"; u.rate = 1.05; u.pitch = .85; if(voice) u.voice = voice;
+    u.onend = next; u.onerror = () => { speaking = false; res(); }; speechSynthesis.speak(u); };
+  next(); }); }
 
-/* ---------- Sprache aus ---------- */
-let voices = [];
-function loadVoices(){
-  voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith("de"));
-  const sel = $("#voice"); sel.innerHTML = "";
-  voices.forEach(v => { const o = document.createElement("option"); o.value = v.name; o.textContent = `${v.name} (${v.lang})`; sel.append(o); });
-  if(cfg.voice) sel.value = cfg.voice;
-}
-speechSynthesis.onvoiceschanged = loadVoices; loadVoices();
-
-function say(text){
-  return new Promise(res => {
-    if(!cfg.speak || !text){ res(); return; }
-    const clean = text.replace(/[*_`#>]/g, "").replace(/https?:\/\/\S+/g, "Link");
-    const parts = clean.match(/[^.!?\n]+[.!?]*/g) || [clean];
-    let i = 0; speaking = true; setState("speaking", "Aria spricht …");
-    const next = () => {
-      if(i >= parts.length){ speaking = false; res(); return; }
-      const u = new SpeechSynthesisUtterance(parts[i++].trim());
-      u.lang = "de-DE"; u.rate = 1.03;
-      const v = voices.find(v => v.name === cfg.voice) || voices[0]; if(v) u.voice = v;
-      u.onend = next; u.onerror = () => { speaking = false; res(); };
-      speechSynthesis.speak(u);
-    };
-    next();
-  });
-}
-
-/* ---------- Sprache ein ---------- */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, recOn = false;
+let rec = null, rOn = false, started = false;
 function startRec(){
-  if(!SR){ add("e", "Dieser Browser kann keine Spracherkennung. Nutze Chrome oder Edge."); return; }
-  if(recOn || busy) return;
+  if(!SR || !started || rOn || busy) return;
   rec = new SR(); rec.lang = "de-DE"; rec.interimResults = true; rec.continuous = false;
-  rec.onstart = () => { recOn = true; setState("listening", cfg.wake && always ? "Sag „Aria …“" : "Ich höre zu …"); };
-  rec.onresult = e => {
-    let t = "", fin = false;
-    for(let i = e.resultIndex; i < e.results.length; i++){ t += e.results[i][0].transcript; if(e.results[i].isFinal) fin = true; }
-    if(!fin){ $("#status").textContent = "… " + t; return; }
-    onHeard(t);
-  };
-  rec.onerror = e => {
-    if(e.error === "not-allowed" || e.error === "service-not-allowed"){ always = false; syncMic(); add("e", "Mikrofon-Zugriff verweigert. Bitte in der Adressleiste erlauben (am besten über http://localhost oder https öffnen)."); }
-  };
-  rec.onend = () => { recOn = false; if(always && !busy && !speaking) setTimeout(startRec, 250); else if(!busy && !speaking) setState("idle", "Tippe auf die Kugel und sprich."); };
+  rec.onstart = () => { rOn = true; setState("listening"); };
+  rec.onresult = e => { let t = "", f = false;
+    for(let i = e.resultIndex; i < e.results.length; i++){ t += e.results[i][0].transcript; if(e.results[i].isFinal) f = true; }
+    if(!f){ if(Date.now() < awakeUntil || /aria|arja/i.test(t)) sub("DU", t); return; }
+    heard(t); };
+  rec.onerror = e => { if(e.error === "not-allowed" || e.error === "service-not-allowed"){ started = false; sub("FEHLER", "Mikrofon blockiert – öffne die Seite über http://localhost und erlaube das Mikrofon."); log("Mikrofon verweigert", "er"); } };
+  rec.onend = () => { rOn = false; if(!busy && !speaking) setTimeout(startRec, 250); };
   try{ rec.start(); }catch(e){}
 }
-function stopRec(){ if(rec){ rec.onend = null; try{ rec.abort(); }catch(e){} } recOn = false; }
-function onHeard(t){
-  if(always && cfg.wake){
-    const re = /\b(aria|arja|arya|maria|area)\b[,.!?:]*\s*/i;
-    if(re.test(t)) t = t.replace(re, "");
-    else if(Date.now() > awakeUntil) return;
-    if(!t.trim()){ add("s", "Ja?"); say("Ja?"); awakeUntil = Date.now() + 9000; return; }
-  }
+function stopRec(){ if(rec){ rec.onend = null; try{ rec.abort(); }catch(e){} } rOn = false; }
+function heard(t){
+  const re = /\b(aria|arja|arya|maria|area)\b[,.!?:]*\s*/i;
+  if(re.test(t)) t = t.replace(re, ""); else if(Date.now() > awakeUntil) return;
+  if(!t.trim()){ awakeUntil = Date.now() + 9000; busy = true; stopRec(); sub("ARIA", "Zu Diensten, Boss."); say("Zu Diensten, Boss.").then(() => { busy = false; setState("standby"); startRec(); }); return; }
   handle(t);
 }
-function syncMic(){ const m = $("#mic"); m.textContent = "Dauerhören: " + (always ? "an" : "aus"); m.classList.toggle("off", !always); m.setAttribute("aria-pressed", always); }
 
-/* ---------- Events ---------- */
-$("#orb").onclick = () => { if(busy){ speechSynthesis.cancel(); return; } recOn ? (stopRec(), setState("idle", "Tippe auf die Kugel und sprich.")) : startRec(); };
-$("#mic").onclick = () => { always = !always; syncMic(); if(always){ awakeUntil = 0; startRec(); } else { stopRec(); setState("idle", "Tippe auf die Kugel und sprich."); } };
-$("#send").onclick = () => { const v = $("#txt").value; $("#txt").value = ""; handle(v); };
-$("#txt").onkeydown = e => { if(e.key === "Enter") $("#send").click(); };
-$("#setBtn").onclick = () => { $("#key").value = cfg.key; $("#wake").checked = cfg.wake; $("#speakOn").checked = cfg.speak; loadVoices(); $("#dlg").showModal(); };
-$("#saveBtn").onclick = () => {
-  cfg.key = $("#key").value.trim(); cfg.voice = $("#voice").value; cfg.wake = $("#wake").checked; cfg.speak = $("#speakOn").checked;
-  store.set("aria_key", cfg.key); store.set("aria_voice", cfg.voice); store.set("aria_wake", cfg.wake); store.set("aria_speak", cfg.speak);
-  $("#dlg").close();
+/* ---------- System- und Uhr-Panels ---------- */
+function tick(){
+  const n = new Date();
+  $("#clock").textContent = n.toLocaleTimeString("de-DE");
+  $("#date").textContent = n.toLocaleDateString("de-DE", { weekday:"long", day:"numeric", month:"long", year:"numeric" }).toUpperCase();
+  $("#net").textContent = navigator.onLine ? "ONLINE" + (navigator.connection?.effectiveType ? " " + navigator.connection.effectiveType.toUpperCase() : "") : "OFFLINE";
+  const t = $("#timers");
+  for(let i = timers.length - 1; i >= 0; i--) if(timers[i].end <= Date.now()){ const x = timers.splice(i, 1)[0]; beep(); log("⏰ " + x.label + " abgelaufen", "ok"); sub("ARIA", x.label + " ist abgelaufen."); if(!busy) say(x.label + " ist abgelaufen, Boss."); }
+  t.innerHTML = timers.length ? "" : '<div style="opacity:.5">keine aktiv</div>';
+  timers.forEach(x => { const s = Math.ceil((x.end - Date.now())/1000), d = document.createElement("div"); d.className = "r"; d.innerHTML = `<span>${x.label}</span><b>${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}</b>`; t.append(d); });
+  const l = Math.round(8 + level*70 + Math.random()*6); $("#load").textContent = l + "%"; $("#loadbar").style.width = l + "%";
+}
+setInterval(tick, 1000); tick();
+$("#cpu").textContent = navigator.hardwareConcurrency || "?";
+$("#ram").textContent = navigator.deviceMemory ? "≥" + navigator.deviceMemory + " GB" : "n/a";
+if(navigator.getBattery) navigator.getBattery().then(b => { const u = () => { $("#bat").textContent = Math.round(b.level*100) + "%" + (b.charging ? " ⚡" : ""); $("#batbar").style.width = b.level*100 + "%"; }; u(); b.onlevelchange = b.onchargingchange = u; });
+else $("#bat").textContent = "n/a";
+renderNotes();
+getWeather("Wildeshausen").catch(() => { $("#wx").textContent = "nicht verfügbar"; });
+
+/* ---------- HUD-Canvas ---------- */
+const cv = $("#cv"), g = cv.getContext("2d"); let W, H, dpr;
+function size(){ dpr = devicePixelRatio || 1; W = innerWidth; H = innerHeight; cv.width = W*dpr; cv.height = H*dpr; g.setTransform(dpr,0,0,dpr,0,0); }
+addEventListener("resize", size); size();
+const css = () => getComputedStyle(document.documentElement).getPropertyValue("--c").trim() || "#2ee6ff";
+let t0 = 0;
+function ring(r, w, a0, a1, alpha){ g.globalAlpha = alpha; g.lineWidth = w; g.beginPath(); g.arc(0, 0, r, a0, a1); g.stroke(); }
+function seg(r, w, n, gap, rot, alpha){ const st = Math.PI*2/n; for(let i = 0; i < n; i++) ring(r, w, rot + i*st, rot + i*st + st*gap, alpha); }
+function ticks(r, n, len, rot, alpha){ g.globalAlpha = alpha; g.lineWidth = 1; g.beginPath(); for(let i = 0; i < n; i++){ const a = rot + i*Math.PI*2/n, l = i % 5 ? len : len*1.9; g.moveTo(Math.cos(a)*r, Math.sin(a)*r); g.lineTo(Math.cos(a)*(r+l), Math.sin(a)*(r+l)); } g.stroke(); }
+function frame(ts){
+  const t = ts/1000, col = css();
+  const target = state === "speaking" ? .55 + .45*Math.abs(Math.sin(t*9)*Math.sin(t*3.7)) : state === "listening" ? .25 + .2*Math.sin(t*3) : state === "thinking" ? .4 : .08;
+  level += (target - level)*.12;
+  const sp = state === "thinking" ? 3.2 : state === "speaking" ? 1.6 : 1;
+  const col2 = state === "thinking" ? "#ffb340" : col;
+  g.clearRect(0, 0, W, H); g.save(); g.translate(W/2, H/2 - 20); g.strokeStyle = col2; g.fillStyle = col2; g.lineCap = "butt";
+  const R = Math.min(W, H) * .27 * (1 + level*.05);
+  g.shadowColor = col2; g.shadowBlur = 8 + level*18;
+  ring(R*1.5, 1, 0, 7, .18);
+  ticks(R*1.42, 120, 5, -t*.05*sp, .55);
+  seg(R*1.3, 3, 3, .55, t*.35*sp, .8);
+  seg(R*1.18, 1.5, 36, .6, -t*.25*sp, .6);
+  ring(R*1.08, 2, 0, 7, .35);
+  seg(R*.98, 6, 5, .62, -t*.6*sp, .85);
+  ring(R*.84, 1, 0, 7, .5);
+  ticks(R*.78, 72, 4, t*.12*sp, .7);
+  seg(R*.66, 3, 2, .38, t*1.1*sp, .9);
+  // Audio-Balken im inneren Ring
+  g.globalAlpha = .9; g.lineWidth = 2; g.beginPath();
+  for(let i = 0; i < 64; i++){ const a = i*Math.PI*2/64, k = (state === "standby" ? .02 : .35)*(.4 + .6*Math.abs(Math.sin(t*5 + i*1.7)*Math.cos(t*2.3 + i*.6)))*(.3 + level*2.2), r0 = R*.5;
+    g.moveTo(Math.cos(a)*r0, Math.sin(a)*r0); g.lineTo(Math.cos(a)*(r0 + R*k), Math.sin(a)*(r0 + R*k)); } g.stroke();
+  // Kern
+  const gr = g.createRadialGradient(0, 0, 0, 0, 0, R*.4); gr.addColorStop(0, "#fff"); gr.addColorStop(.25, col2); gr.addColorStop(1, "rgba(0,0,0,0)");
+  g.globalAlpha = .55 + level*.45; g.fillStyle = gr; g.beginPath(); g.arc(0, 0, R*.4*(1 + level*.25), 0, 7); g.fill();
+  g.shadowBlur = 0; g.globalAlpha = 1; g.fillStyle = "#031318"; g.font = "800 " + Math.round(R*.12) + "px Orbitron, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("A.R.I.A", 0, 0);
+  g.restore();
+  // Eck-Winkel
+  g.save(); g.strokeStyle = col; g.globalAlpha = .5; g.lineWidth = 2; const m = 10, L = 40;
+  [[m,m,1,1],[W-m,m,-1,1],[m,H-m,1,-1],[W-m,H-m,-1,-1]].forEach(([x,y,a,b]) => { g.beginPath(); g.moveTo(x, y + b*L); g.lineTo(x, y); g.lineTo(x + a*L, y); g.stroke(); });
+  g.restore();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ---------- Start ---------- */
+$("#boot").onclick = async () => {
+  $("#boot").remove(); started = true;
+  if(!SR){ sub("FEHLER", "Spracherkennung fehlt – bitte Chrome oder Edge nutzen."); return; }
+  try{ const s = await navigator.mediaDevices.getUserMedia({ audio:true }); s.getTracks().forEach(t => t.stop()); }catch(e){}
+  busy = true; log("Systeme online", "ok"); sub("ARIA", "Alle Systeme online. Sag „Aria“, wenn du mich brauchst.");
+  await say("Alle Systeme online. Zu Diensten, Boss."); busy = false; setState("standby"); startRec();
 };
-$("#clearBtn").onclick = () => { history = []; $("#log").innerHTML = ""; $("#dlg").close(); };
-
-add("a", cfg.key ? "Aria ist online. Wie kann ich helfen?" : "Hallo, ich bin Aria. Trag zuerst in den Einstellungen deinen Gemini API-Key ein.");
-if(!cfg.key) setTimeout(() => $("#setBtn").click(), 400);
+$("#orb") && 0;
 </script>
 </body>
 </html>
