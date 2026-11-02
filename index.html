@@ -64,6 +64,60 @@ canvas{position:fixed;inset:0;width:100%;height:100%}
 #cwcode.live::after{content:"▍";animation:bl .7s infinite}
 #cwfr{flex:1;border:0;border-left:1px solid var(--c2);background:#fff;min-width:0}
 @media(max-width:900px){#cwmain{flex-direction:column}#cwfr{border-left:0;border-top:1px solid var(--c2)}.wd{display:none}}
+/* ===== Agent-Fenster ===== */
+#ag{position:fixed;inset:6vh 6vw;z-index:7;display:flex;flex-direction:column;background:rgba(2,14,20,.97);border:1px solid var(--c);box-shadow:0 0 40px rgba(46,230,255,.3)}
+#ag[hidden]{display:none}
+#agbar{display:flex;align-items:center;gap:12px;padding:8px 12px;border-bottom:1px solid var(--c2)}
+#agt{flex:1;font:600 12px Orbitron,sans-serif;letter-spacing:.2em}
+#agst{color:var(--ok);font-size:12px}
+#agbar button{background:none;border:1px solid var(--c2);color:var(--c);padding:2px 10px;cursor:pointer;font:inherit}
+#agmain{flex:1;display:flex;min-height:0}
+#agbr{flex:1;display:flex;flex-direction:column;min-width:0;background:#dfe1e5}
+#agtabs{background:#202124;padding:6px 10px 0}
+#agtab{display:inline-block;background:#fff;color:#202124;padding:5px 14px;border-radius:8px 8px 0 0;font:12px Arial,sans-serif;max-width:60%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:90px}
+#agurl{background:#fff;color:#202124;padding:7px 12px;border-bottom:1px solid #ddd;font:13px Arial,sans-serif;display:flex;gap:6px;white-space:nowrap;overflow:hidden}
+#agu{overflow:hidden;text-overflow:ellipsis}
+#agvp{position:relative;flex:1;background:#fff;overflow:hidden;color:#202124;font:14px/1.5 Arial,sans-serif}
+#agpg{position:absolute;inset:0;overflow:hidden;padding:18px 22px}
+#agcur{position:absolute;left:0;top:0;width:22px;height:22px;z-index:4;pointer-events:none;transition:transform .5s cubic-bezier(.4,0,.2,1);filter:drop-shadow(0 2px 3px rgba(0,0,0,.45))}
+.rip{position:absolute;width:12px;height:12px;margin:-6px;border-radius:50%;background:rgba(46,130,255,.5);z-index:3;animation:rp .6s forwards}
+@keyframes rp{to{transform:scale(4);opacity:0}}
+#agside{width:230px;border-left:1px solid var(--c2);padding:10px 12px;overflow:auto}
+#agside h4{font:600 11px Orbitron,sans-serif;letter-spacing:.2em;margin-bottom:8px}
+#agsteps div{color:#9fe9f5;padding:2px 0;font-size:12px}
+#agsteps div.done::before{content:"✓ ";color:var(--ok)}
+#agsteps div.act{color:var(--c)}#agsteps div.act::before{content:"▸ "}
+.gh{display:flex;flex-direction:column;align-items:center;margin-top:7vh;gap:22px}
+.gl{font:600 64px Arial,sans-serif;letter-spacing:-2px}
+.gb{display:flex;align-items:center;gap:10px;width:min(520px,90%);border:1px solid #dfe1e5;border-radius:24px;padding:10px 16px;box-shadow:0 1px 6px rgba(32,33,36,.2);min-height:44px;background:#fff}
+.caret{display:inline-block;width:1px;height:18px;background:#202124;animation:bl 1s infinite}
+.gbt{display:flex;gap:10px}.gbt span{background:#f8f9fa;border:1px solid #eee;padding:9px 16px;border-radius:4px;font-size:13px}
+.gtop{display:flex;align-items:center;gap:18px;border-bottom:1px solid #ebebeb;padding-bottom:10px;margin-bottom:6px}
+.gtop .gl{font-size:26px}.gtop .gb{width:min(460px,60%);padding:6px 14px;min-height:36px}
+.gtabs{display:flex;gap:18px;color:#5f6368;font-size:13px;margin:6px 0 12px}
+.gr{margin-bottom:16px;max-width:620px}.gs{font-size:12px}.gt{color:#1a0dab;font-size:19px;line-height:1.3}.gd{color:#4d5156;font-size:13px}
+.sk{height:12px;border-radius:6px;margin:10px 0;background:linear-gradient(90deg,#eee,#f8f8f8,#eee);background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.ar h1{font:700 24px Georgia,serif;margin:6px 0 12px}.ah{color:#5f6368;font-size:12px;border-bottom:1px solid #eee;padding-bottom:6px}
+.ar p{font:16px/1.7 Georgia,serif;max-width:640px}.sn{transition:background .3s}.sn.hl{background:#fff3a0}
+.sum{position:absolute;left:3%;right:3%;bottom:3%;background:#0b2a35;color:#d6faff;border:1px solid var(--c);padding:12px 16px;font:14px/1.5 "Share Tech Mono",monospace;z-index:2;max-height:55%;overflow:hidden}
+.sum b{display:block;color:var(--c);letter-spacing:.2em;margin-bottom:4px;font-size:11px;font-weight:400}
+.ytb{display:flex;align-items:center;gap:6px;font-size:20px}
+.yr{display:flex;gap:14px;margin:14px 0}.th{width:200px;max-width:35%;height:112px;border-radius:10px;background:linear-gradient(135deg,#ddd,#bbb)}
+.mp{position:absolute;inset:0;background-color:#e8eaed;background-image:linear-gradient(#fff 2px,transparent 2px),linear-gradient(90deg,#fff 2px,transparent 2px);background-size:60px 60px}
+.mpb{position:absolute;left:14px;top:14px;width:min(340px,80%);background:#fff;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,.3);border-radius:8px;z-index:1}
+.mpb .gb{width:100%;box-shadow:none}
+.pin{position:absolute;left:60%;top:-50px;font-size:38px;transition:top .6s cubic-bezier(.3,1.6,.5,1)}
+.wc{text-align:center;margin-top:8vh}
+.cxd{max-width:300px;margin:6vh auto 0;background:#202124;color:#fff;padding:18px;border-radius:12px;font:22px "Share Tech Mono",monospace;min-height:120px}
+.cxd div{min-height:30px;word-break:break-all}.cxd .cr{font-size:34px;color:#8ab4f8}
+.np{max-width:560px;margin:2vh auto;background:#fffbe0;padding:16px 20px;border:1px solid #e6dca0;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.nl{color:#8a7f3a;font-size:11px;letter-spacing:.1em;margin-top:8px}.nf{min-height:24px;border-bottom:1px dashed #cfc57a;white-space:pre-wrap}
+#cwst{display:flex;gap:6px;flex-wrap:wrap;padding:6px 12px;border-bottom:1px solid var(--c2);font-size:11px}
+#cwst span{opacity:.35;padding:1px 8px;border:1px solid var(--c2)}
+#cwst .on{opacity:1;border-color:var(--c);animation:bl 1s infinite}
+#cwst .dn{opacity:.9;color:var(--ok)}#cwst .dn::before{content:"✓ "}
+@media(max-width:900px){#agside{display:none}#ag{inset:3vh 2vw}.gl{font-size:44px}}
 </style>
 </head>
 <body>
@@ -104,11 +158,26 @@ canvas{position:fixed;inset:0;width:100%;height:100%}
   <div id="cwmain"><pre id="cwcode"></pre><iframe id="cwfr" sandbox="allow-scripts" title="Vorschau"></iframe></div>
 </div>
 
+<div id="ag" hidden>
+  <div id="agbar"><span id="agt">ARIA AGENT</span><span id="agst">● LIVE</span><button id="agx">SCHLIESSEN</button></div>
+  <div id="agmain">
+    <div id="agbr">
+      <div id="agtabs"><span id="agtab">Neuer Tab</span></div>
+      <div id="agurl"><span>🔒</span><span id="agu"></span></div>
+      <div id="agvp"><div id="agpg"></div>
+        <svg id="agcur" viewBox="0 0 24 24"><path d="M3 2l7 18 2.5-7.5L20 10z" fill="#000" stroke="#fff" stroke-width="1.5"/></svg>
+      </div>
+    </div>
+    <div id="agside"><h4>AKTIONEN</h4><div id="agsteps"></div></div>
+  </div>
+</div>
+
 <div id="boot"><h1>ARIA</h1><p>BERÜHREN ZUM STARTEN</p></div>
 
 <script>
 "use strict";
-const KEY = "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";
+/* Der API-Key wird nicht mehr im Code gespeichert, sondern einmalig abgefragt und nur in deinem Browser abgelegt. */
+const KEY = (() => { try{ let k = localStorage.getItem("aria_key"); if(!k){ k = (prompt("Groq API-Key (gsk_…) eingeben:") || "").trim(); if(k) localStorage.setItem("aria_key", k); } return k; }catch(e){ return ""; } })();
 const $ = s => document.querySelector(s);
 const ls = { g(k,d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
              s(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} } };
@@ -553,6 +622,128 @@ runTool = async function(n, a){
   }
   return rt(n, a);
 };
+})();
+</script>
+
+<script>
+"use strict";
+/* ===== ERWEITERUNG 2: LIVE-AGENT-FENSTER (Browser-Simulation mit Cursor, Tippen, Klicks) ===== */
+(function(){
+const w = $("#ag"), pg = $("#agpg"), vp = $("#agvp"), cur = $("#agcur");
+let tok = 0, hideT;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+const host = u => { try{ return new URL(u).hostname.replace(/^www\./, ""); }catch(e){ return String(u).slice(0, 30); } };
+const LOGO = [["G","#4285f4"],["o","#ea4335"],["o","#fbbc05"],["g","#4285f4"],["l","#34a853"],["e","#ea4335"]].map(([c, k]) => `<span style="color:${k}">${c}</span>`).join("");
+const sk = n => Array(n).fill('<div class="sk" style="width:30%"></div><div class="sk" style="width:70%;height:18px"></div><div class="sk" style="width:90%"></div><div class="sk" style="width:80%"></div><br>').join("");
+const gHome = () => `<div class="gh"><div class="gl">${LOGO}</div><div class="gb" id="gbox">🔍<span id="gq"></span><i class="caret"></i></div><div class="gbt"><span id="gbtn">Google Suche</span><span>Auf gut Glück!</span></div></div>`;
+const gRes = (q, items) => `<div class="gtop"><div class="gl">${LOGO}</div><div class="gb">🔍<span>${esc(q)}</span></div></div><div class="gtabs"><span>Alle</span><span>Bilder</span><span>News</span><span>Videos</span><span>Maps</span></div>` +
+  (items ? items.map((s, i) => `<div class="gr" data-i="${i}"><div class="gs">${esc(host(s.url))} › ${esc(s.url.replace(/^https?:\/\/[^/]+/, "").slice(0, 40))}</div><div class="gt">${esc(s.title)}</div><div class="gd">${esc(s.content.slice(0, 150))}…</div></div>`).join("") : sk(3));
+const article = s => { const sn = (s.content.replace(/\s+/g, " ").match(/[^.!?]+[.!?]*/g) || [s.content]).slice(0, 6);
+  return `<div class="ar"><div class="ah">${esc(host(s.url))}</div><h1>${esc(s.title)}</h1><p>${sn.map(x => `<span class="sn">${esc(x)}</span>`).join(" ")}</p></div>`; };
+const sUrl = q => "https://www.google.com/search?q=" + encodeURIComponent(q);
+
+function scene(title, fn){
+  const my = ++tok; clearTimeout(hideT);
+  const ok = () => { if(my !== tok) throw 0; };
+  const z = ms => new Promise(r => setTimeout(r, ms)).then(ok);
+  let cx = 40, cy = 40;
+  const pt = el => { const r = el.getClientRects()[0] || el.getBoundingClientRect(), v = vp.getBoundingClientRect(); return [r.left - v.left + Math.min(r.width/2, 60), r.top - v.top + r.height/2]; };
+  const A = {
+    z,
+    set(html){ ok(); pg.innerHTML = html; pg.scrollTop = 0; },
+    step(t){ ok(); const s = $("#agsteps"); s.querySelectorAll(".act").forEach(e => e.className = "done"); const d = document.createElement("div"); d.className = "act"; d.textContent = t; s.append(d); s.scrollTop = s.scrollHeight; },
+    async url(u){ ok(); $("#agtab").textContent = host(u); const e = $("#agu"); e.textContent = ""; for(const ch of u){ e.textContent += ch; await z(12); } await z(250); },
+    async type(el, t, sp = 32){ for(const ch of t){ ok(); el.textContent += ch; await z(sp*(.5 + Math.random())); } },
+    async mv(el, dx = 0, dy = 0){ ok(); let r = el.getBoundingClientRect(), v = vp.getBoundingClientRect(); if(r.bottom > v.bottom - 30 || r.top < v.top){ pg.scrollTop += r.top - v.top - 120; }
+      const [x, y] = pt(el); cx = x + dx; cy = y + dy; cur.style.transform = `translate(${cx}px,${cy}px)`; await z(600); },
+    async click(){ ok(); const d = document.createElement("div"); d.className = "rip"; d.style.left = cx + "px"; d.style.top = cy + "px"; vp.append(d); setTimeout(() => d.remove(), 700); await z(250); },
+    async google(q){
+      A.step("Öffne Browser"); await A.url("https://www.google.com"); A.set(gHome()); await z(500);
+      A.step("Klicke ins Suchfeld"); await A.mv($("#gbox")); await A.click();
+      A.step("Tippe: " + q.slice(0, 50)); await A.type($("#gq"), q); await z(300);
+      A.step("Starte Suche"); await A.mv($("#gbtn")); await A.click();
+      await A.url(sUrl(q)); A.set(gRes(q, null));
+    }
+  };
+  w.hidden = false; $("#agt").textContent = "ARIA AGENT · " + title; $("#agst").textContent = "● LIVE"; $("#agsteps").innerHTML = ""; pg.innerHTML = ""; $("#agu").textContent = ""; $("#agtab").textContent = "Neuer Tab"; cur.style.transform = "translate(40px,40px)";
+  (async () => { try{ await fn(A); }catch(e){ if(e !== 0) console.warn(e); }
+    if(my === tok){ $("#agsteps").querySelectorAll(".act").forEach(e => e.className = "done"); $("#agst").textContent = "● FERTIG"; hideT = setTimeout(() => { if(my === tok) w.hidden = true; }, 4000); } })();
+}
+$("#agx").onclick = () => { tok++; w.hidden = true; };
+addEventListener("keydown", e => { if(e.key === "Escape" && !w.hidden) $("#agx").click(); });
+
+/* ---------- Recherche (echte Quellen aus der Groq-Suche) ---------- */
+async function doR(q){
+  const msgs = [{ role:"system", content:"Recherchiere im Web und antworte auf Deutsch präzise in höchstens 120 Wörtern mit konkreten Fakten, Zahlen und Quellen-Namen." }, { role:"user", content:q }];
+  let r; try{ r = await groq({ model:"openai/gpt-oss-120b", messages:msgs, tools:[{ type:"browser_search" }], reasoning_effort:"low", max_completion_tokens:2000 }); }
+  catch(e){ r = await groq({ model:"openai/gpt-oss-20b", messages:msgs, reasoning_effort:"low", max_completion_tokens:1200 }); }
+  const m = r.choices?.[0]?.message || {}, src = [], seen = new Set();
+  const walk = (o, d) => { if(!o || d > 6) return; if(Array.isArray(o)) return o.forEach(x => walk(x, d + 1));
+    if(typeof o === "object"){ if(typeof o.url === "string" && o.title && /^https?:/.test(o.url)){ if(!seen.has(o.url)){ seen.add(o.url); src.push({ title:String(o.title), url:o.url, content:String(o.content || o.snippet || o.text || "") }); } } else Object.values(o).forEach(x => walk(x, d + 1)); } };
+  walk(m.executed_tools, 0);
+  return { text: m.content || "nichts gefunden", src: src.slice(0, 5) };
+}
+function researchScene(q, p, getRes){
+  scene("RECHERCHE", async A => {
+    await A.google(q); A.step("Warte auf Ergebnisse …"); await p;
+    const res = getRes(); if(res.err){ A.step("Fehler: " + res.err.message); return; }
+    let src = res.src; if(!src.length) src = [{ title:"Ergebnis: " + q, url:sUrl(q), content:res.text }];
+    A.set(gRes(q, src)); A.step(src.length + " Ergebnisse gefunden"); await A.z(600);
+    for(let i = 0; i < Math.min(2, src.length); i++){
+      const s = src[i]; await A.mv($(`.gr[data-i="${i}"] .gt`)); await A.click(); A.step("Öffne " + host(s.url));
+      await A.url(s.url); A.set(article(s)); await A.z(500); A.step("Lese Seite …");
+      for(const e of document.querySelectorAll("#agpg .sn")){ await A.mv(e); e.classList.add("hl"); await A.z(200); }
+      if(i === 0 && src.length > 1){ A.step("Zurück zu den Ergebnissen"); await A.url(sUrl(q)); A.set(gRes(q, src)); await A.z(400); }
+    }
+    A.step("Fasse zusammen"); const d = document.createElement("div"); d.className = "sum"; d.innerHTML = "<b>ARIA · ZUSAMMENFASSUNG</b><span></span>"; pg.append(d); await A.type(d.lastChild, res.text.slice(0, 280), 12);
+  });
+}
+
+/* ---------- Szenen für weitere Tools ---------- */
+const fields = (title, list) => scene(title, async A => {
+  A.step("Öffne Editor"); await A.url("aria://" + title.toLowerCase()); A.set(`<div class="np">${list.map((f, i) => `<div class="nl">${esc(f[0])}</div><div class="nf" id="nf${i}"></div>`).join("")}</div>`); await A.z(400);
+  for(let i = 0; i < list.length; i++){ A.step("Schreibe: " + list[i][0]); await A.mv($("#nf" + i)); await A.click(); await A.type($("#nf" + i), String(list[i][1] || "").slice(0, 220), 22); }
+});
+const rt0 = runTool;
+runTool = async function(n, a){
+  try{
+    if(n === "research"){
+      const q = String(a.query || ""); let res = null; const p = doR(q).then(v => { res = v; }, e => { res = { err:e }; });
+      researchScene(q, p, () => res); await p; return res.err ? "Fehler: " + res.err.message : res.text;
+    }
+    if(n === "code_website"){ tok++; w.hidden = true; }
+    if(n === "web_search") scene("GOOGLE", async A => { await A.google(String(a.query || "")); A.step("Ergebnisse öffnen sich im neuen Tab"); await A.z(1500); });
+    if(n === "open_url"){ const u = /^https?:\/\//.test(a.url) ? a.url : "https://" + a.url; scene("BROWSER", async A => { A.step("Öffne neuen Tab"); await A.url(u); A.set('<div class="sk" style="width:40%;height:26px"></div>' + sk(3)); A.step("Seite lädt …"); await A.z(1500); }); }
+    if(n === "youtube") scene("YOUTUBE", async A => { const q = String(a.query || "");
+      A.step("Öffne YouTube"); await A.url("https://www.youtube.com");
+      A.set(`<div class="ytb"><b style="color:#f00">▶</b><b>YouTube</b><div class="gb" id="gbox" style="margin-left:20px"><span id="gq"></span><i class="caret"></i></div></div>`); await A.z(400);
+      A.step("Klicke ins Suchfeld"); await A.mv($("#gbox")); await A.click(); A.step("Tippe: " + q.slice(0, 50)); await A.type($("#gq"), q);
+      A.step("Suche starten"); await A.z(300); await A.click(); await A.url("https://www.youtube.com/results?search_query=" + encodeURIComponent(q));
+      A.set(`<div class="ytb"><b style="color:#f00">▶</b><b>YouTube</b></div>` + Array(4).fill('<div class="yr"><div class="th"></div><div style="flex:1"><div class="sk" style="width:80%;height:18px"></div><div class="sk" style="width:40%"></div><div class="sk" style="width:60%"></div></div></div>').join(""));
+      A.step("Ergebnisse öffnen sich im neuen Tab"); await A.z(1500); });
+    if(n === "maps") scene("MAPS", async A => { const q = String(a.query || "");
+      A.step("Öffne Google Maps"); await A.url("https://www.google.com/maps");
+      A.set(`<div class="mp"><div class="mpb"><div class="gb" id="gbox">🔍<span id="gq"></span><i class="caret"></i></div></div><div class="pin" id="pin">📍</div></div>`); await A.z(500);
+      A.step("Klicke ins Suchfeld"); await A.mv($("#gbox")); await A.click(); A.step("Tippe: " + q.slice(0, 50)); await A.type($("#gq"), q); await A.z(300);
+      A.step("Suche Ort"); await A.url("https://www.google.com/maps/search/" + encodeURIComponent(q)); $("#pin").style.top = "42%"; A.step("Ort markiert"); await A.z(1500); });
+    if(n === "save_note") fields("NOTIZ", [["NOTIZ", a.text]]);
+    if(n === "compose_email") fields("E-MAIL", [["AN", a.to], ["BETREFF", a.subject], ["TEXT", a.body]]);
+    const r = await rt0(n, a);
+    if(n === "weather" && r && typeof r === "object" && r.jetzt) scene("WETTER", async A => { await A.google("Wetter " + a.city); A.step("Lese Wetterdaten");
+      A.set(`<div class="wc"><div style="color:#5f6368">Wetter · ${esc(r.ort)}</div><div style="font:300 64px Arial">${Math.round(r.jetzt.temperatur)}°C</div><div>${esc(r.jetzt.zustand)} · gefühlt ${Math.round(r.jetzt.gefuehlt)}° · Wind ${Math.round(r.jetzt.wind_kmh)} km/h</div></div>`); await A.z(1800); });
+    if(n === "calculate") scene("RECHNER", async A => { A.step("Öffne Rechner"); await A.url("https://www.google.com/search?q=rechner");
+      A.set('<div class="cxd"><div id="ce"></div><div class="cr" id="cr"></div></div>'); await A.z(400); A.step("Gebe Ausdruck ein"); await A.mv($("#ce")); await A.click(); await A.type($("#ce"), String(a.expression || ""), 70);
+      A.step("Berechne"); await A.z(400); $("#cr").textContent = "= " + r; await A.z(1500); });
+    return r;
+  }catch(e){ return "Fehler: " + e.message; }
+};
+
+/* ---------- Code-Fenster: sichtbare Agent-Schritte ---------- */
+const bar = document.createElement("div"); bar.id = "cwst"; $("#cw").insertBefore(bar, $("#cwmain"));
+const ST = ["Plane Layout", "Schreibe Styles", "Baue Inhalt", "Füge Skripte hinzu", "Teste Vorschau"];
+function upd(){ const c = $("#cwcode").textContent; let n = c ? 1 : 0; if(/<style/i.test(c)) n = 2; if(/<body/i.test(c)) n = 3; if(/<script/i.test(c)) n = 4; if(/<\/html>/i.test(c)) n = 5;
+  bar.innerHTML = ST.map((s, i) => `<span class="${(n === 5 || i < n - 1) ? "dn" : i === n - 1 ? "on" : ""}">${s}</span>`).join(""); }
+new MutationObserver(upd).observe($("#cwcode"), { childList:true, characterData:true, subtree:true }); upd();
 })();
 </script>
 </body>
