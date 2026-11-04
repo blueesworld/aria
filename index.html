@@ -77,6 +77,14 @@ canvas{position:fixed;inset:0;width:100%;height:100%}
 #rwans{color:#d6faff!important;font-size:15px;max-height:none!important}
 #rw pre.live::after{content:"▍";animation:bl .7s infinite}
 #rwsrc a{display:block;color:var(--c);word-break:break-all;margin-top:3px}
+
+/* ===== ERWEITERUNG 3: Telegram ===== */
+#hbtn{position:fixed;top:14px;right:334px;z-index:4;background:rgba(4,30,42,.7);border:1px solid var(--c);color:var(--c);padding:6px 12px;cursor:pointer;font:600 12px Orbitron,sans-serif;letter-spacing:.2em}
+#hmenu{position:fixed;top:50px;right:22px;z-index:4;width:min(320px,90vw);max-height:80vh;overflow:auto;padding:12px 14px;background:rgba(2,18,26,.96);border:1px solid var(--c);color:#d6faff}
+#hmenu[hidden]{display:none}#hmenu h4{font:600 11px Orbitron,sans-serif;letter-spacing:.2em;color:var(--c);margin:10px 0 6px}
+#hmenu button{background:none;border:1px solid var(--c2);color:var(--c);padding:3px 9px;margin:2px 4px 2px 0;cursor:pointer;font:inherit}
+#hmenu input{width:100%;background:#031318;color:var(--c);border:1px solid var(--c2);padding:4px;font:inherit;margin:2px 0 6px}
+#hmenu small{display:block;opacity:.7;margin-top:6px}#hmenu .ok{color:var(--ok)}#hmenu .er{color:var(--warn)}
 </style>
 </head>
 <body>
@@ -952,6 +960,162 @@ $("#boot").onclick = async () => {
     } catch (e) { return "Fehler: " + e.message; }
     return rt(nm, a);
   };
+})();
+</script>
+<script>
+"use strict";
+/* ===== ERWEITERUNG 3: Telegram (Senden & Empfangen) ===== */
+(function () {
+  /* ---------- KONFIGURATION (fest eingebaut) ---------- */
+  let TG_TOKEN = "9218323898:AAE9KG4HPDnt2o_JaTqTnfx2sNsvuJDf8hM"; 
+  let TG_CHATID = "9280697806"; 
+  /* ------------------------------------ */
+
+  const og = ls.g;
+  const EXTRA = [
+    "Du kannst dem Nutzer Telegram-Nachrichten schicken (Tool telegram_send). Wenn der Nutzer dir über Telegram schreibt, landen seine Nachrichten automatisch in diesem Chat hier. Du kannst ihm auch direkt über Telegram antworten, wenn er nicht am PC ist. Timer-Ende geht automatisch per Telegram raus."
+  ];
+  ls.g = (k, d) => k === "aria_facts" ? EXTRA.concat(og(k, d)) : og(k, d);
+
+  const ready = () => !!(TG_TOKEN && TG_CHATID);
+
+  /* ---------- Telegram Nachricht senden ---------- */
+  async function tgSend(text) {
+    if (!ready()) return "Telegram nicht konfiguriert";
+    try {
+      const r = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: TG_CHATID, text: text })
+      });
+      const d = await r.json();
+      if (!d.ok) return "Telegram-Fehler: " + d.description;
+      log("📱 Telegram an dich gesendet", "ok");
+      return "Telegram gesendet";
+    } catch (e) {
+      return "Telegram-Fehler: " + e.message;
+    }
+  }
+
+  /* Timer-Ende automatisch per Telegram */
+  const origBeep = beep;
+  beep = function () {
+    try { origBeep(); } catch (e) {}
+    tgSend("⏰ Timer abgelaufen, Boss.").catch(() => {});
+  };
+
+  /* ---------- Tool für die KI ---------- */
+  const obj = (p, r) => ({ type: "object", properties: p, required: r || [] });
+  OTOOLS.push({ type: "function", function: {
+    name: "telegram_send",
+    description: "Schickt dem Nutzer eine Nachricht über Telegram aufs Handy.",
+    parameters: obj({ text: { type: "string" } }, ["text"])
+  } });
+
+  const rt = runTool;
+  runTool = async function (nm, a) {
+    if (nm === "telegram_send") return await tgSend(String(a.text || ""));
+    return rt(nm, a);
+  };
+
+  /* ---------- Nachrichten von Telegram EMPFANGEN ---------- */
+  let lastUpdateId = null;
+  async function pollTelegram() {
+    if (!ready()) return;
+    try {
+      const r = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/getUpdates?timeout=10${lastUpdateId ? '&offset=' + lastUpdateId : ''}`);
+      const d = await r.json();
+      if (d.ok && d.result.length) {
+        for (let u of d.result) {
+          lastUpdateId = u.update_id + 1;
+          if (u.message && u.message.text && String(u.message.chat.id) === String(TG_CHATID)) {
+            if (busy) {
+              tgSend("Ich bin gerade beschäftigt, Boss. Gib mir einen Moment.").catch(() => {});
+              continue;
+            }
+            const text = u.message.text;
+            log("📱 Telegram empfangen: " + text.slice(0, 20) + "...", "ok");
+            handle(text, "Über Telegram empfangen");
+            setTimeout(async () => {
+                const ans = $("#subt").textContent;
+                if (ans) tgSend(ans).catch(() => {});
+            }, 2000);
+          }
+        }
+      }
+    } catch (e) {}
+    setTimeout(pollTelegram, 3000); 
+  }
+
+  /* ---------- UI: 📱-Button + Setup-Menü ---------- */
+  const st = document.createElement("style");
+  st.textContent =
+    "#hbtn{position:fixed;top:14px;right:334px;z-index:4;background:rgba(4,30,42,.7);border:1px solid var(--c);color:var(--c);padding:6px 12px;cursor:pointer;font:600 12px Orbitron,sans-serif;letter-spacing:.2em}" +
+    "#hmenu{position:fixed;top:50px;right:22px;z-index:4;width:min(320px,90vw);max-height:80vh;overflow:auto;padding:12px 14px;background:rgba(2,18,26,.96);border:1px solid var(--c);color:#d6faff}" +
+    "#hmenu[hidden]{display:none}#hmenu h4{font:600 11px Orbitron,sans-serif;letter-spacing:.2em;color:var(--c);margin:10px 0 6px}" +
+    "#hmenu button{background:none;border:1px solid var(--c2);color:var(--c);padding:3px 9px;margin:2px 4px 2px 0;cursor:pointer;font:inherit}" +
+    "#hmenu input{width:100%;background:#031318;color:var(--c);border:1px solid var(--c2);padding:4px;font:inherit;margin:2px 0 6px}" +
+    "#hmenu small{display:block;opacity:.7;margin-top:6px}#hmenu .ok{color:var(--ok)}#hmenu .er{color:var(--warn)}";
+  document.head.append(st);
+
+  const b = document.createElement("button"); b.id = "hbtn"; b.textContent = "📱 HANDY";
+  const hm = document.createElement("div"); hm.id = "hmenu"; hm.hidden = true;
+  document.body.append(b, hm);
+
+  function renderH() {
+    hm.innerHTML = "";
+    const H = t => { const h = document.createElement("h4"); h.textContent = t; hm.append(h); };
+    const B = (t, f) => { const x = document.createElement("button"); x.textContent = t; x.onclick = f; hm.append(x); };
+    const I = (lbl, val, ph) => {
+      const h = document.createElement("div"); h.textContent = lbl; h.style.cssText = "font-size:11px;opacity:.8;margin-top:6px";
+      const i = document.createElement("input"); i.value = val || ""; i.placeholder = ph || "";
+      hm.append(h, i); return i;
+    };
+
+    H("STATUS");
+    const s = document.createElement("div");
+    s.className = ready() ? "ok" : "er";
+    s.textContent = ready() ? "✓ Telegram konfiguriert & aktiv" : "⚠ Token und Chat-ID eintragen";
+    hm.append(s);
+
+    H("TELEGRAM VERBINDUNG");
+    const tk = I("Bot Token (von @BotFather)", TG_TOKEN, "123456789:ABCdef...");
+    const ci = I("Deine Chat-ID (Zahl von getUpdates)", TG_CHATID, "123456789");
+    B("💾 Speichern", () => {
+      TG_TOKEN = tk.value.trim();
+      TG_CHATID = ci.value.trim();
+      ls.s("tg_token", TG_TOKEN);
+      ls.s("tg_chatid", TG_CHATID);
+      location.reload();
+    });
+    B("📤 Test senden", () => tgSend("Test von ARIA – Telegram funktioniert, Boss."));
+
+    H("HINWEIS");
+    const n = document.createElement("div");
+    n.style.cssText = "font-size:11px;opacity:.75;line-height:1.5;margin-top:6px";
+    n.innerHTML = 
+      "Du kannst ARIA jetzt direkt über den Telegram-Chat schreiben!<br><br>" +
+      "Damit ARIA deine Nachrichten empfangen und beantworten kann, muss diese Browser-Seite im Hintergrund geöffnet bleiben. Sie fragt alle 3 Sekunden nach neuen Nachrichten.";
+    hm.append(n);
+  }
+
+  b.onclick = () => {
+    $("#wmenu").hidden = true; $("#vmenu") && ($("#vmenu").hidden = true);
+    hm.hidden = !hm.hidden; if (!hm.hidden) renderH();
+  };
+  $("#wbtn").addEventListener("click", () => { hm.hidden = true; });
+  document.addEventListener("click", e => {
+    if (!hm.hidden && e.target !== b && !hm.contains(e.target)) hm.hidden = true;
+  });
+  addEventListener("keydown", e => { if (e.key === "Escape") hm.hidden = true; });
+
+  /* localStorage überschreibt die Standard-Werte */
+  const lt = og("tg_token", ""), lc = og("tg_chatid", "");
+  if (lt) TG_TOKEN = lt;
+  if (lc) TG_CHATID = lc;
+
+  // Polling starten, wenn konfiguriert
+  if (ready()) pollTelegram();
 })();
 </script>
 </body>
