@@ -964,9 +964,9 @@ $("#boot").onclick = async () => {
 </script>
 <script>
 "use strict";
-/* ===== ERWEITERUNG 3: Telegram (Senden & Empfangen) ===== */
+/* ===== ERWEITERUNG 3: Telegram (Senden & Empfangen, gefixt) ===== */
 (function () {
-  /* ---------- KONFIGURATION (fest eingebaut) ---------- */
+  /* ---------- KONFIGURATION ---------- */
   let TG_TOKEN = "9218323898:AAE9KG4HPDnt2o_JaTqTnfx2sNsvuJDf8hM"; 
   let TG_CHATID = "9280697806"; 
   /* ------------------------------------ */
@@ -1018,7 +1018,7 @@ $("#boot").onclick = async () => {
     return rt(nm, a);
   };
 
-  /* ---------- Nachrichten von Telegram EMPFANGEN ---------- */
+  /* ---------- Nachrichten von Telegram EMPFANGEN (Gefixt) ---------- */
   let lastUpdateId = null;
   async function pollTelegram() {
     if (!ready()) return;
@@ -1035,11 +1035,25 @@ $("#boot").onclick = async () => {
             }
             const text = u.message.text;
             log("📱 Telegram empfangen: " + text.slice(0, 20) + "...", "ok");
-            handle(text, "Über Telegram empfangen");
-            setTimeout(async () => {
-                const ans = $("#subt").textContent;
-                if (ans) tgSend(ans).catch(() => {});
-            }, 2000);
+            
+            // Reparatur: Direkt an die KI senden, anstatt handle() zu triggern
+            (async () => {
+              busy = true;
+              setState("thinking");
+              sub("DU (Telegram)", text);
+              try {
+                const ans = await ask(text); // KI Antwort holen
+                if (ans) {
+                  tgSend(ans).catch(() => {}); // Per Telegram antworten
+                  sub("ARIA", ans); // Auf dem Bildschirm anzeigen
+                  await say(ans); // Vorlesen
+                }
+              } catch(e) {
+                tgSend("Fehler: " + e.message).catch(() => {});
+              }
+              busy = false;
+              setState("standby");
+            })();
           }
         }
       }
@@ -1114,7 +1128,7 @@ $("#boot").onclick = async () => {
   if (lt) TG_TOKEN = lt;
   if (lc) TG_CHATID = lc;
 
-  // Polling starten, wenn konfiguriert
+  // Polling starten
   if (ready()) pollTelegram();
 })();
 </script>
