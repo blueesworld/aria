@@ -58,12 +58,8 @@ canvas{position:fixed;inset:0;width:100%;height:100%}
 #cwcode.live::after{content:"▍";animation:bl .7s infinite}
 #cwfr{flex:1;border:0;border-left:1px solid var(--c2);background:#fff;min-width:0}
 @media(max-width:900px){#cwmain{flex-direction:column}#cwfr{border-left:0;border-top:1px solid var(--c2)}.wd{display:none}}
-/*EXTCSS*/
-</style>
-</head>
-<!-- ARIA Erweiterung 2: komplett VOR </body> einfügen (nach dem letzten </script>) -->
-<style>
-/* Erweiterung 2: Voice, Live-Recherche */
+
+/* ===== ERWEITERUNG 2: Voice-Menü + Live-Recherche ===== */
 #vbtn{position:fixed;top:14px;right:178px;z-index:4;background:rgba(4,30,42,.7);border:1px solid var(--c);color:var(--c);padding:6px 12px;cursor:pointer;font:600 12px Orbitron,sans-serif;letter-spacing:.2em}
 #vmenu{position:fixed;top:50px;right:22px;z-index:4;width:min(300px,90vw);max-height:80vh;overflow:auto;padding:12px 14px;background:rgba(2,18,26,.96);border:1px solid var(--c);color:#d6faff}
 #vmenu[hidden],#rw[hidden]{display:none}
@@ -82,244 +78,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%}
 #rw pre.live::after{content:"▍";animation:bl .7s infinite}
 #rwsrc a{display:block;color:var(--c);word-break:break-all;margin-top:3px}
 </style>
-<script>
-"use strict";
-/* ===== ERWEITERUNG 2: Voice-Menü, Live-Recherche, neue Skills ===== */
-(function () {
-  const og = ls.g;
-  const EXTRA = [
-    "Neue Skills: wikipedia (Begriffe/Personen), currency (Umrechnung), crypto_price, news, product_research (Dropshipping-Ideen, ehrlich inkl. Risiken), briefing (bei 'Guten Morgen' oder 'was steht an'), pomodoro, random_pick, password (nie vorlesen), speak_foreign (Aussprache in Fremdsprachen), set_voice_gender (männliche/weibliche Stimme)",
-    "Recherchen laufen live sichtbar auf dem Bildschirm; sag kurz, dass du recherchierst"
-  ];
-  ls.g = (k, d) => k === "aria_facts" ? EXTRA.concat(og(k, d)) : og(k, d);
-
-  /* ---------- VOICE ---------- */
-  const M = /(^|[^a-z])male|männlich|conrad|stefan|markus|killian|florian|jonas|martin|hans|yannick|reed|daniel|thomas/i;
-  const F = /female|weiblich|katja|amala|vicki|marlene|hedda|petra|seraphina|helena|anna|elke|louisa|google deutsch/i;
-  let gender = og("aria_vg", "m"), exact = false;
-  const de = () => speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith("de"));
-  pickVoice = function () {
-    const v = de(), nm = og("aria_vname", "");
-    let x = nm && v.find(a => a.name === nm);
-    exact = true;
-    if (!x) x = v.find(a => gender === "f" ? F.test(a.name) : (M.test(a.name) && !F.test(a.name)));
-    if (!x) { exact = false; x = v.find(a => gender === "f" ? true : !F.test(a.name)) || v[0] || null; }
-    voice = x || null;
-  };
-  speechSynthesis.onvoiceschanged = () => { pickVoice(); renderV(); };
-  const sv = og("aria_vo", null);
-  if (sv) { vo.rate = sv.rate; vo.pitch = sv.pitch; } else vo.pitch = gender === "f" ? 1.05 : .85;
-  pickVoice();
-  const saveV = () => ls.s("aria_vo", { rate: vo.rate, pitch: vo.pitch });
-  function applyGender(g) {
-    gender = g === "f" ? "f" : "m";
-    ls.s("aria_vg", gender); ls.s("aria_vname", "");
-    pickVoice();
-    vo.pitch = gender === "f" ? (exact ? 1.05 : 1.3) : (exact ? .85 : .7);
-    saveV(); renderV();
-  }
-  const vb = document.createElement("button"); vb.id = "vbtn"; vb.textContent = "♪ VOICE";
-  const vm = document.createElement("div"); vm.id = "vmenu"; vm.hidden = true;
-  document.body.append(vb, vm);
-  function place() { const r = $("#wbtn").getBoundingClientRect(); vb.style.right = Math.round(innerWidth - r.left + 10) + "px"; }
-  addEventListener("resize", place); place();
-  if (document.fonts) document.fonts.ready.then(place);
-  vb.onclick = () => { $("#wmenu").hidden = true; vm.hidden = !vm.hidden; if (!vm.hidden) renderV(); };
-  $("#wbtn").addEventListener("click", () => { vm.hidden = true; });
-  function renderV() {
-    vm.innerHTML = "";
-    const H = t => { const h = document.createElement("h4"); h.textContent = t; vm.append(h); };
-    const B = (t, f, on) => { const b = document.createElement("button"); b.textContent = t; b.onclick = f; if (on) b.className = "on"; vm.append(b); };
-    const R = (lbl, min, max, val, fn) => {
-      H(lbl);
-      const i = document.createElement("input");
-      i.type = "range"; i.min = min; i.max = max; i.step = .05; i.value = val;
-      i.oninput = () => { fn(+i.value); saveV(); };
-      vm.append(i);
-    };
-    H("STIMME");
-    B("♂ MÄNNLICH", () => applyGender("m"), gender === "m");
-    B("♀ WEIBLICH", () => applyGender("f"), gender === "f");
-    H("STIMMEN-AUSWAHL");
-    const sel = document.createElement("select");
-    sel.innerHTML = '<option value="">automatisch</option>';
-    de().forEach(v => { const o = document.createElement("option"); o.value = v.name; o.textContent = v.name; sel.append(o); });
-    sel.value = og("aria_vname", "");
-    sel.onchange = () => { ls.s("aria_vname", sel.value); pickVoice(); };
-    vm.append(sel);
-    if (!exact && !og("aria_vname", "")) {
-      const n = document.createElement("small");
-      n.textContent = "Keine " + (gender === "f" ? "weibliche" : "männliche") + " deutsche Stimme installiert – Tonhöhe wurde angepasst.";
-      vm.append(n);
-    }
-    R("TEMPO", .6, 1.6, vo.rate, v => vo.rate = v);
-    R("TONHÖHE", .4, 1.8, vo.pitch, v => vo.pitch = v);
-    H("TEST");
-    B("▶ TESTEN", () => { speechSynthesis.cancel(); say("Hallo Boss, so klinge ich."); });
-  }
-
-  /* ---------- LIVE-RECHERCHE ---------- */
-  const rw = document.createElement("div"); rw.id = "rw"; rw.hidden = true;
-  rw.innerHTML = '<div id="rwbar"><span id="rwt">RECHERCHE</span><button id="rwcp">KOPIEREN</button><button id="rwx">SCHLIESSEN</button></div><div id="rwbody"><div class="rwh">DENKEN &amp; SUCHEN</div><pre id="rwth"></pre><div class="rwh">ANTWORT</div><pre id="rwans"></pre><div class="rwh">QUELLEN</div><div id="rwsrc"></div></div>';
-  document.body.append(rw);
-  let rc = null;
-  $("#rwx").onclick = () => { if (rc) rc.abort(); rw.hidden = true; };
-  $("#rwcp").onclick = () => navigator.clipboard.writeText($("#rwans").textContent).catch(() => {});
-  addEventListener("keydown", e => { if (e.key === "Escape") { $("#rwx").click(); vm.hidden = true; } });
-
-  async function researchLive(q) {
-    if (rc) rc.abort();
-    rc = new AbortController();
-    const th = $("#rwth"), an = $("#rwans"), sr = $("#rwsrc"), bd = $("#rwbody");
-    rw.hidden = false; th.textContent = "▸ Starte Websuche …\n"; an.textContent = ""; sr.innerHTML = "";
-    $("#rwt").textContent = "ARIA RECHERCHIERT: " + q.slice(0, 50);
-    th.classList.add("live");
-    const seen = new Set(), seenQ = new Set(), hosts = [];
-    const addSrc = (u, t) => {
-      if (!/^https?:\/\//i.test(u || "") || seen.has(u) || seen.size >= 8) return;
-      seen.add(u);
-      try { hosts.push(new URL(u).hostname.replace(/^www\./, "")); } catch (e) {}
-      const a = document.createElement("a"); a.href = u; a.target = "_blank"; a.rel = "noopener"; a.textContent = "› " + (t || u); sr.append(a);
-    };
-    const tool = t => {
-      if (!t) return;
-      let args = t.arguments;
-      try { if (typeof args === "string") args = JSON.parse(args); } catch (e) { args = {}; }
-      const qq = args && (args.query || args.url);
-      if (qq && !seenQ.has(qq)) { seenQ.add(qq); th.textContent += (args.query ? "🔎 Suche: " : "📄 Lese: ") + qq + "\n"; }
-      ((t.search_results && t.search_results.results) || []).forEach(r => addSrc(r.url, r.title));
-    };
-    const msgs = [{ role: "system", content: "Recherchiere im Web und antworte auf Deutsch präzise in höchstens 120 Wörtern mit konkreten Fakten, Zahlen und Quellen-Namen." }, { role: "user", content: q }];
-    let ans = "";
-    for (const [model, useTool] of [["openai/gpt-oss-120b", 1], ["openai/gpt-oss-20b", 1], ["openai/gpt-oss-20b", 0]]) {
-      try {
-        const body = { model, messages: msgs, stream: true, reasoning_effort: "low", max_completion_tokens: 2000 };
-        if (useTool) body.tools = [{ type: "browser_search" }];
-        const r = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: "POST", signal: rc.signal, headers: { "Content-Type": "application/json", "Authorization": "Bearer " + KEY }, body: JSON.stringify(body) });
-        if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error((d.error && d.error.message) || "HTTP " + r.status); }
-        const rd = r.body.getReader(), dec = new TextDecoder();
-        let buf = ""; an.classList.add("live");
-        for (;;) {
-          const { done, value } = await rd.read();
-          if (done) break;
-          buf += dec.decode(value, { stream: true });
-          const lines = buf.split("\n"); buf = lines.pop();
-          for (const l of lines) {
-            if (!l.startsWith("data:") || l.includes("[DONE]")) continue;
-            let j; try { j = JSON.parse(l.slice(5)); } catch (e) { continue; }
-            const c = j.choices && j.choices[0], dl = (c && c.delta) || {};
-            if (dl.reasoning) th.textContent += dl.reasoning;
-            (dl.executed_tools || (c && c.message && c.message.executed_tools) || []).forEach(tool);
-            if (dl.content) { ans += dl.content; an.textContent = ans; }
-          }
-          th.scrollTop = th.scrollHeight; bd.scrollTop = bd.scrollHeight;
-        }
-        if (ans.trim()) break;
-      } catch (e) {
-        if (e.name === "AbortError") return "Recherche abgebrochen";
-        th.textContent += "⚠ " + e.message + " – nächster Versuch\n";
-      }
-    }
-    th.classList.remove("live"); an.classList.remove("live");
-    $("#rwt").textContent = "FERTIG: " + q.slice(0, 50);
-    log("Recherche fertig", "ok");
-    ans = ans.trim() || "nichts gefunden";
-    an.textContent = ans;
-    return ans + (hosts.length ? "\nQuellen: " + [...new Set(hosts)].slice(0, 5).join(", ") : "");
-  }
-
-  /* ---------- NEUE TOOLS ---------- */
-  const obj = (p, r) => ({ type: "object", properties: p, required: r || [] });
-  const s = { type: "string" }, n = { type: "number" };
-  const add = (name, description, parameters) => OTOOLS.push({ type: "function", function: { name, description, parameters: parameters || obj({}) } });
-  add("wikipedia", "Schlägt einen Begriff oder eine Person in Wikipedia nach und zeigt eine Infokarte.", obj({ query: s }, ["query"]));
-  add("currency", "Rechnet Währungen um (aktueller Kurs), z.B. EUR nach USD.", obj({ amount: n, from: s, to: s }, ["amount", "from", "to"]));
-  add("crypto_price", "Aktueller Kryptokurs in EUR und USD. coin = englische CoinGecko-ID wie bitcoin, ethereum.", obj({ coin: s }, ["coin"]));
-  add("news", "Aktuelle Nachrichten zu einem Thema, live recherchiert.", obj({ topic: s }, ["topic"]));
-  add("product_research", "Recherchiert Dropshipping-/E-Commerce-Produktideen oder Nischen live (Nachfrage, Konkurrenz, Marge, Risiken).", obj({ niche: s }, ["niche"]));
-  add("briefing", "Tagesbriefing: Datum, Wetter, Notizen, offene Aufgaben, Timer.");
-  add("pomodoro", "Startet eine Fokusphase (Standard 25 Min) mit anschließender 5-Minuten-Pause.", obj({ minutes: n }));
-  add("random_pick", "Zufall: coin (Münze), dice (Würfel, max=Seiten), number (min..max) oder choose (options).", obj({ kind: { type: "string", enum: ["coin", "dice", "number", "choose"] }, min: n, max: n, options: { type: "array", items: s } }, ["kind"]));
-  add("password", "Erzeugt ein sicheres Passwort, kopiert es in die Zwischenablage und zeigt es an. Niemals vorlesen.", obj({ length: n }));
-  add("speak_foreign", "Spricht einen Text mit richtiger Aussprache in einer Fremdsprache (lang z.B. en-US, es-ES, fr-FR, tr-TR) und zeigt ihn an.", obj({ text: s, lang: s }, ["text", "lang"]));
-  add("set_voice_gender", "Wechselt zwischen männlicher (m) und weiblicher (f) Stimme.", obj({ gender: { type: "string", enum: ["m", "f"] } }, ["gender"]));
-
-  const rt = runTool;
-  runTool = async function (nm, a) {
-    try {
-      switch (nm) {
-        case "research": return await researchLive(String(a.query || ""));
-        case "news": return await researchLive("Aktuelle Nachrichten (heute ist der " + new Date().toLocaleDateString("de-DE") + ") zu: " + a.topic + ". Nenne 3-5 Schlagzeilen mit Quelle.");
-        case "product_research": return await researchLive("Recherchiere aktuelle Dropshipping-/E-Commerce-Chancen in der Nische '" + a.niche + "' im deutschsprachigen Raum: Nachfrage, Konkurrenz, grobe Marge, Risiken (Retouren, Zoll, Verbraucherrecht). Realistisch, keine Gewinnversprechen.");
-        case "wikipedia": {
-          const q = String(a.query || "");
-          const o = await (await fetch("https://de.wikipedia.org/w/api.php?action=opensearch&limit=1&format=json&origin=*&search=" + encodeURIComponent(q))).json();
-          const t = o[1] && o[1][0];
-          if (!t) return "nichts gefunden";
-          const r = await (await fetch("https://de.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(t.replace(/ /g, "_")))).json();
-          const url = (r.content_urls && r.content_urls.desktop && r.content_urls.desktop.page) || "https://de.wikipedia.org/wiki/" + encodeURIComponent(t);
-          showCard(r.title || t, r.extract || "", [{ title: "Wikipedia", url }]);
-          return { titel: r.title || t, text: (r.extract || "").slice(0, 1200) };
-        }
-        case "currency": {
-          const amt = Number(a.amount) || 1, f = String(a.from || "EUR").toUpperCase(), t = String(a.to || "USD").toUpperCase();
-          let d;
-          try { d = await (await fetch(`https://api.frankfurter.dev/v1/latest?base=${f}&symbols=${t}&amount=${amt}`)).json(); if (!d.rates) throw 0; }
-          catch (e) { d = await (await fetch(`https://api.frankfurter.app/latest?amount=${amt}&from=${f}&to=${t}`)).json(); }
-          return d.rates ? `${amt} ${f} = ${d.rates[t]} ${t} (Stand ${d.date})` : "Kurs nicht verfügbar";
-        }
-        case "crypto_price": {
-          const id = String(a.coin || "bitcoin").toLowerCase().trim().replace(/\s+/g, "-");
-          const d = await (await fetch("https://api.coingecko.com/api/v3/simple/price?include_24hr_change=true&vs_currencies=eur,usd&ids=" + encodeURIComponent(id))).json();
-          const x = d[id];
-          return x ? { coin: id, eur: x.eur, usd: x.usd, aenderung_24h_prozent: x.eur_24h_change } : "Coin nicht gefunden (englische ID wie bitcoin oder ethereum)";
-        }
-        case "briefing": {
-          let w = null;
-          try { w = await getWeather("Wildeshausen"); } catch (e) {}
-          const open = [];
-          ls.g("aria_widgets", []).forEach(x => (x.items || []).forEach(i => { if (!i.done) open.push(i.text); }));
-          return { jetzt: new Date().toLocaleString("de-DE", { dateStyle: "full", timeStyle: "short" }), wetter: w && w.jetzt, vorhersage: w && w.vorhersage, notizen: ls.g("aria_notes", []).slice(-5).map(x => x.text), offene_aufgaben: open, aktive_timer: timers.length };
-        }
-        case "pomodoro": {
-          const m = Math.max(1, Math.min(120, Number(a.minutes) || 25));
-          timers.push({ end: Date.now() + m * 60000, label: "Fokus" }, { end: Date.now() + (m + 5) * 60000, label: "Pause vorbei" });
-          return `Fokusphase ${m} Minuten läuft, danach 5 Minuten Pause`;
-        }
-        case "random_pick": {
-          const R = (lo, hi) => Math.floor(Math.random() * (hi - lo + 1)) + lo;
-          if (a.kind === "coin") return Math.random() < .5 ? "Kopf" : "Zahl";
-          if (a.kind === "dice") return String(R(1, Math.max(2, a.max || 6)));
-          if (a.kind === "choose") return (a.options && a.options.length) ? a.options[R(0, a.options.length - 1)] : "keine Optionen";
-          return String(R(a.min || 1, a.max || 100));
-        }
-        case "password": {
-          const L = Math.max(8, Math.min(64, Number(a.length) || 16)), cs = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%&*?";
-          const u = new Uint32Array(L); crypto.getRandomValues(u);
-          const pw = [...u].map(v => cs[v % cs.length]).join("");
-          let c = "";
-          try { await navigator.clipboard.writeText(pw); c = " und kopiert"; } catch (e) {}
-          showCard("PASSWORT", pw);
-          return "Passwort erzeugt" + c + ". Nicht vorlesen.";
-        }
-        case "speak_foreign": {
-          const lang = String(a.lang || "en-US"), t = String(a.text || "");
-          showCard("AUSSPRACHE · " + lang, t);
-          speechSynthesis.cancel();
-          const u = new SpeechSynthesisUtterance(t); u.lang = lang; u.rate = .95;
-          const v = speechSynthesis.getVoices().filter(x => x.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));
-          const pv = v.find(x => gender === "f" ? F.test(x.name) : (M.test(x.name) && !F.test(x.name))) || v[0];
-          if (pv) u.voice = pv;
-          await new Promise(r => { u.onend = u.onerror = r; setTimeout(r, 2000 + t.length * 120); speechSynthesis.speak(u); });
-          return "gesprochen";
-        }
-        case "set_voice_gender": applyGender(a.gender); return gender === "f" ? "weibliche Stimme aktiv" : "männliche Stimme aktiv";
-      }
-    } catch (e) { return "Fehler: " + e.message; }
-    return rt(nm, a);
-  };
-})();
-</script>
+</head>
 <body>
 <canvas id="cv"></canvas>
 <div id="top"><div id="clock">--:--:--</div><div id="date"></div></div>
@@ -958,7 +717,242 @@ $("#boot").onclick = async () => {
 })();
 </script>
 <script>
-/*EXTJS*/
+"use strict";
+/* ===== ERWEITERUNG 2: Voice-Menü, Live-Recherche, neue Skills ===== */
+(function () {
+  const og = ls.g;
+  const EXTRA = [
+    "Neue Skills: wikipedia (Begriffe/Personen), currency (Umrechnung), crypto_price, news, product_research (Dropshipping-Ideen, ehrlich inkl. Risiken), briefing (bei 'Guten Morgen' oder 'was steht an'), pomodoro, random_pick, password (nie vorlesen), speak_foreign (Aussprache in Fremdsprachen), set_voice_gender (männliche/weibliche Stimme)",
+    "Recherchen laufen live sichtbar auf dem Bildschirm; sag kurz, dass du recherchierst"
+  ];
+  ls.g = (k, d) => k === "aria_facts" ? EXTRA.concat(og(k, d)) : og(k, d);
+
+  /* ---------- VOICE ---------- */
+  const M = /(^|[^a-z])male|männlich|conrad|stefan|markus|killian|florian|jonas|martin|hans|yannick|reed|daniel|thomas/i;
+  const F = /female|weiblich|katja|amala|vicki|marlene|hedda|petra|seraphina|helena|anna|elke|louisa|google deutsch/i;
+  let gender = og("aria_vg", "m"), exact = false;
+  const de = () => speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith("de"));
+  pickVoice = function () {
+    const v = de(), nm = og("aria_vname", "");
+    let x = nm && v.find(a => a.name === nm);
+    exact = true;
+    if (!x) x = v.find(a => gender === "f" ? F.test(a.name) : (M.test(a.name) && !F.test(a.name)));
+    if (!x) { exact = false; x = v.find(a => gender === "f" ? true : !F.test(a.name)) || v[0] || null; }
+    voice = x || null;
+  };
+  speechSynthesis.onvoiceschanged = () => { pickVoice(); renderV(); };
+  const sv = og("aria_vo", null);
+  if (sv) { vo.rate = sv.rate; vo.pitch = sv.pitch; } else vo.pitch = gender === "f" ? 1.05 : .85;
+  pickVoice();
+  const saveV = () => ls.s("aria_vo", { rate: vo.rate, pitch: vo.pitch });
+  function applyGender(g) {
+    gender = g === "f" ? "f" : "m";
+    ls.s("aria_vg", gender); ls.s("aria_vname", "");
+    pickVoice();
+    vo.pitch = gender === "f" ? (exact ? 1.05 : 1.3) : (exact ? .85 : .7);
+    saveV(); renderV();
+  }
+  const vb = document.createElement("button"); vb.id = "vbtn"; vb.textContent = "♪ VOICE";
+  const vm = document.createElement("div"); vm.id = "vmenu"; vm.hidden = true;
+  document.body.append(vb, vm);
+  function place() { const r = $("#wbtn").getBoundingClientRect(); vb.style.right = Math.round(innerWidth - r.left + 10) + "px"; }
+  addEventListener("resize", place); place();
+  if (document.fonts) document.fonts.ready.then(place);
+  vb.onclick = () => { $("#wmenu").hidden = true; vm.hidden = !vm.hidden; if (!vm.hidden) renderV(); };
+  $("#wbtn").addEventListener("click", () => { vm.hidden = true; });
+  function renderV() {
+    vm.innerHTML = "";
+    const H = t => { const h = document.createElement("h4"); h.textContent = t; vm.append(h); };
+    const B = (t, f, on) => { const b = document.createElement("button"); b.textContent = t; b.onclick = f; if (on) b.className = "on"; vm.append(b); };
+    const R = (lbl, min, max, val, fn) => {
+      H(lbl);
+      const i = document.createElement("input");
+      i.type = "range"; i.min = min; i.max = max; i.step = .05; i.value = val;
+      i.oninput = () => { fn(+i.value); saveV(); };
+      vm.append(i);
+    };
+    H("STIMME");
+    B("♂ MÄNNLICH", () => applyGender("m"), gender === "m");
+    B("♀ WEIBLICH", () => applyGender("f"), gender === "f");
+    H("STIMMEN-AUSWAHL");
+    const sel = document.createElement("select");
+    sel.innerHTML = '<option value="">automatisch</option>';
+    de().forEach(v => { const o = document.createElement("option"); o.value = v.name; o.textContent = v.name; sel.append(o); });
+    sel.value = og("aria_vname", "");
+    sel.onchange = () => { ls.s("aria_vname", sel.value); pickVoice(); };
+    vm.append(sel);
+    if (!exact && !og("aria_vname", "")) {
+      const n = document.createElement("small");
+      n.textContent = "Keine " + (gender === "f" ? "weibliche" : "männliche") + " deutsche Stimme installiert – Tonhöhe wurde angepasst.";
+      vm.append(n);
+    }
+    R("TEMPO", .6, 1.6, vo.rate, v => vo.rate = v);
+    R("TONHÖHE", .4, 1.8, vo.pitch, v => vo.pitch = v);
+    H("TEST");
+    B("▶ TESTEN", () => { speechSynthesis.cancel(); say("Hallo Boss, so klinge ich."); });
+  }
+
+  /* ---------- LIVE-RECHERCHE ---------- */
+  const rw = document.createElement("div"); rw.id = "rw"; rw.hidden = true;
+  rw.innerHTML = '<div id="rwbar"><span id="rwt">RECHERCHE</span><button id="rwcp">KOPIEREN</button><button id="rwx">SCHLIESSEN</button></div><div id="rwbody"><div class="rwh">DENKEN &amp; SUCHEN</div><pre id="rwth"></pre><div class="rwh">ANTWORT</div><pre id="rwans"></pre><div class="rwh">QUELLEN</div><div id="rwsrc"></div></div>';
+  document.body.append(rw);
+  let rc = null;
+  $("#rwx").onclick = () => { if (rc) rc.abort(); rw.hidden = true; };
+  $("#rwcp").onclick = () => navigator.clipboard.writeText($("#rwans").textContent).catch(() => {});
+  addEventListener("keydown", e => { if (e.key === "Escape") { $("#rwx").click(); vm.hidden = true; } });
+
+  async function researchLive(q) {
+    if (rc) rc.abort();
+    rc = new AbortController();
+    const th = $("#rwth"), an = $("#rwans"), sr = $("#rwsrc"), bd = $("#rwbody");
+    rw.hidden = false; th.textContent = "▸ Starte Websuche …\n"; an.textContent = ""; sr.innerHTML = "";
+    $("#rwt").textContent = "ARIA RECHERCHIERT: " + q.slice(0, 50);
+    th.classList.add("live");
+    const seen = new Set(), seenQ = new Set(), hosts = [];
+    const addSrc = (u, t) => {
+      if (!/^https?:\/\//i.test(u || "") || seen.has(u) || seen.size >= 8) return;
+      seen.add(u);
+      try { hosts.push(new URL(u).hostname.replace(/^www\./, "")); } catch (e) {}
+      const a = document.createElement("a"); a.href = u; a.target = "_blank"; a.rel = "noopener"; a.textContent = "› " + (t || u); sr.append(a);
+    };
+    const tool = t => {
+      if (!t) return;
+      let args = t.arguments;
+      try { if (typeof args === "string") args = JSON.parse(args); } catch (e) { args = {}; }
+      const qq = args && (args.query || args.url);
+      if (qq && !seenQ.has(qq)) { seenQ.add(qq); th.textContent += (args.query ? "🔎 Suche: " : "📄 Lese: ") + qq + "\n"; }
+      ((t.search_results && t.search_results.results) || []).forEach(r => addSrc(r.url, r.title));
+    };
+    const msgs = [{ role: "system", content: "Recherchiere im Web und antworte auf Deutsch präzise in höchstens 120 Wörtern mit konkreten Fakten, Zahlen und Quellen-Namen." }, { role: "user", content: q }];
+    let ans = "";
+    for (const [model, useTool] of [["openai/gpt-oss-120b", 1], ["openai/gpt-oss-20b", 1], ["openai/gpt-oss-20b", 0]]) {
+      try {
+        const body = { model, messages: msgs, stream: true, reasoning_effort: "low", max_completion_tokens: 2000 };
+        if (useTool) body.tools = [{ type: "browser_search" }];
+        const r = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: "POST", signal: rc.signal, headers: { "Content-Type": "application/json", "Authorization": "Bearer " + KEY }, body: JSON.stringify(body) });
+        if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error((d.error && d.error.message) || "HTTP " + r.status); }
+        const rd = r.body.getReader(), dec = new TextDecoder();
+        let buf = ""; an.classList.add("live");
+        for (;;) {
+          const { done, value } = await rd.read();
+          if (done) break;
+          buf += dec.decode(value, { stream: true });
+          const lines = buf.split("\n"); buf = lines.pop();
+          for (const l of lines) {
+            if (!l.startsWith("data:") || l.includes("[DONE]")) continue;
+            let j; try { j = JSON.parse(l.slice(5)); } catch (e) { continue; }
+            const c = j.choices && j.choices[0], dl = (c && c.delta) || {};
+            if (dl.reasoning) th.textContent += dl.reasoning;
+            (dl.executed_tools || (c && c.message && c.message.executed_tools) || []).forEach(tool);
+            if (dl.content) { ans += dl.content; an.textContent = ans; }
+          }
+          th.scrollTop = th.scrollHeight; bd.scrollTop = bd.scrollHeight;
+        }
+        if (ans.trim()) break;
+      } catch (e) {
+        if (e.name === "AbortError") return "Recherche abgebrochen";
+        th.textContent += "⚠ " + e.message + " – nächster Versuch\n";
+      }
+    }
+    th.classList.remove("live"); an.classList.remove("live");
+    $("#rwt").textContent = "FERTIG: " + q.slice(0, 50);
+    log("Recherche fertig", "ok");
+    ans = ans.trim() || "nichts gefunden";
+    an.textContent = ans;
+    return ans + (hosts.length ? "\nQuellen: " + [...new Set(hosts)].slice(0, 5).join(", ") : "");
+  }
+
+  /* ---------- NEUE TOOLS ---------- */
+  const obj = (p, r) => ({ type: "object", properties: p, required: r || [] });
+  const s = { type: "string" }, n = { type: "number" };
+  const add = (name, description, parameters) => OTOOLS.push({ type: "function", function: { name, description, parameters: parameters || obj({}) } });
+  add("wikipedia", "Schlägt einen Begriff oder eine Person in Wikipedia nach und zeigt eine Infokarte.", obj({ query: s }, ["query"]));
+  add("currency", "Rechnet Währungen um (aktueller Kurs), z.B. EUR nach USD.", obj({ amount: n, from: s, to: s }, ["amount", "from", "to"]));
+  add("crypto_price", "Aktueller Kryptokurs in EUR und USD. coin = englische CoinGecko-ID wie bitcoin, ethereum.", obj({ coin: s }, ["coin"]));
+  add("news", "Aktuelle Nachrichten zu einem Thema, live recherchiert.", obj({ topic: s }, ["topic"]));
+  add("product_research", "Recherchiert Dropshipping-/E-Commerce-Produktideen oder Nischen live (Nachfrage, Konkurrenz, Marge, Risiken).", obj({ niche: s }, ["niche"]));
+  add("briefing", "Tagesbriefing: Datum, Wetter, Notizen, offene Aufgaben, Timer.");
+  add("pomodoro", "Startet eine Fokusphase (Standard 25 Min) mit anschließender 5-Minuten-Pause.", obj({ minutes: n }));
+  add("random_pick", "Zufall: coin (Münze), dice (Würfel, max=Seiten), number (min..max) oder choose (options).", obj({ kind: { type: "string", enum: ["coin", "dice", "number", "choose"] }, min: n, max: n, options: { type: "array", items: s } }, ["kind"]));
+  add("password", "Erzeugt ein sicheres Passwort, kopiert es in die Zwischenablage und zeigt es an. Niemals vorlesen.", obj({ length: n }));
+  add("speak_foreign", "Spricht einen Text mit richtiger Aussprache in einer Fremdsprache (lang z.B. en-US, es-ES, fr-FR, tr-TR) und zeigt ihn an.", obj({ text: s, lang: s }, ["text", "lang"]));
+  add("set_voice_gender", "Wechselt zwischen männlicher (m) und weiblicher (f) Stimme.", obj({ gender: { type: "string", enum: ["m", "f"] } }, ["gender"]));
+
+  const rt = runTool;
+  runTool = async function (nm, a) {
+    try {
+      switch (nm) {
+        case "research": return await researchLive(String(a.query || ""));
+        case "news": return await researchLive("Aktuelle Nachrichten (heute ist der " + new Date().toLocaleDateString("de-DE") + ") zu: " + a.topic + ". Nenne 3-5 Schlagzeilen mit Quelle.");
+        case "product_research": return await researchLive("Recherchiere aktuelle Dropshipping-/E-Commerce-Chancen in der Nische '" + a.niche + "' im deutschsprachigen Raum: Nachfrage, Konkurrenz, grobe Marge, Risiken (Retouren, Zoll, Verbraucherrecht). Realistisch, keine Gewinnversprechen.");
+        case "wikipedia": {
+          const q = String(a.query || "");
+          const o = await (await fetch("https://de.wikipedia.org/w/api.php?action=opensearch&limit=1&format=json&origin=*&search=" + encodeURIComponent(q))).json();
+          const t = o[1] && o[1][0];
+          if (!t) return "nichts gefunden";
+          const r = await (await fetch("https://de.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(t.replace(/ /g, "_")))).json();
+          const url = (r.content_urls && r.content_urls.desktop && r.content_urls.desktop.page) || "https://de.wikipedia.org/wiki/" + encodeURIComponent(t);
+          showCard(r.title || t, r.extract || "", [{ title: "Wikipedia", url }]);
+          return { titel: r.title || t, text: (r.extract || "").slice(0, 1200) };
+        }
+        case "currency": {
+          const amt = Number(a.amount) || 1, f = String(a.from || "EUR").toUpperCase(), t = String(a.to || "USD").toUpperCase();
+          let d;
+          try { d = await (await fetch(`https://api.frankfurter.dev/v1/latest?base=${f}&symbols=${t}&amount=${amt}`)).json(); if (!d.rates) throw 0; }
+          catch (e) { d = await (await fetch(`https://api.frankfurter.app/latest?amount=${amt}&from=${f}&to=${t}`)).json(); }
+          return d.rates ? `${amt} ${f} = ${d.rates[t]} ${t} (Stand ${d.date})` : "Kurs nicht verfügbar";
+        }
+        case "crypto_price": {
+          const id = String(a.coin || "bitcoin").toLowerCase().trim().replace(/\s+/g, "-");
+          const d = await (await fetch("https://api.coingecko.com/api/v3/simple/price?include_24hr_change=true&vs_currencies=eur,usd&ids=" + encodeURIComponent(id))).json();
+          const x = d[id];
+          return x ? { coin: id, eur: x.eur, usd: x.usd, aenderung_24h_prozent: x.eur_24h_change } : "Coin nicht gefunden (englische ID wie bitcoin oder ethereum)";
+        }
+        case "briefing": {
+          let w = null;
+          try { w = await getWeather("Wildeshausen"); } catch (e) {}
+          const open = [];
+          ls.g("aria_widgets", []).forEach(x => (x.items || []).forEach(i => { if (!i.done) open.push(i.text); }));
+          return { jetzt: new Date().toLocaleString("de-DE", { dateStyle: "full", timeStyle: "short" }), wetter: w && w.jetzt, vorhersage: w && w.vorhersage, notizen: ls.g("aria_notes", []).slice(-5).map(x => x.text), offene_aufgaben: open, aktive_timer: timers.length };
+        }
+        case "pomodoro": {
+          const m = Math.max(1, Math.min(120, Number(a.minutes) || 25));
+          timers.push({ end: Date.now() + m * 60000, label: "Fokus" }, { end: Date.now() + (m + 5) * 60000, label: "Pause vorbei" });
+          return `Fokusphase ${m} Minuten läuft, danach 5 Minuten Pause`;
+        }
+        case "random_pick": {
+          const R = (lo, hi) => Math.floor(Math.random() * (hi - lo + 1)) + lo;
+          if (a.kind === "coin") return Math.random() < .5 ? "Kopf" : "Zahl";
+          if (a.kind === "dice") return String(R(1, Math.max(2, a.max || 6)));
+          if (a.kind === "choose") return (a.options && a.options.length) ? a.options[R(0, a.options.length - 1)] : "keine Optionen";
+          return String(R(a.min || 1, a.max || 100));
+        }
+        case "password": {
+          const L = Math.max(8, Math.min(64, Number(a.length) || 16)), cs = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%&*?";
+          const u = new Uint32Array(L); crypto.getRandomValues(u);
+          const pw = [...u].map(v => cs[v % cs.length]).join("");
+          let c = "";
+          try { await navigator.clipboard.writeText(pw); c = " und kopiert"; } catch (e) {}
+          showCard("PASSWORT", pw);
+          return "Passwort erzeugt" + c + ". Nicht vorlesen.";
+        }
+        case "speak_foreign": {
+          const lang = String(a.lang || "en-US"), t = String(a.text || "");
+          showCard("AUSSPRACHE · " + lang, t);
+          speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(t); u.lang = lang; u.rate = .95;
+          const v = speechSynthesis.getVoices().filter(x => x.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));
+          const pv = v.find(x => gender === "f" ? F.test(x.name) : (M.test(x.name) && !F.test(x.name))) || v[0];
+          if (pv) u.voice = pv;
+          await new Promise(r => { u.onend = u.onerror = r; setTimeout(r, 2000 + t.length * 120); speechSynthesis.speak(u); });
+          return "gesprochen";
+        }
+        case "set_voice_gender": applyGender(a.gender); return gender === "f" ? "weibliche Stimme aktiv" : "männliche Stimme aktiv";
+      }
+    } catch (e) { return "Fehler: " + e.message; }
+    return rt(nm, a);
+  };
+})();
 </script>
 </body>
 </html>
